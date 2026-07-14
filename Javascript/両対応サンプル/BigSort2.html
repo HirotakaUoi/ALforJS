@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>BigSort2（Node.js・ブラウザ両対応）</title>
+<style>
+    body { font-family: sans-serif; margin: 2em; }
+    pre  { background: #f4f4f4; padding: 1em; border-radius: 6px; }
+</style>
+</head>
+<body>
+<h1>BigSort2（5種のソートの速度比較）</h1>
+<p>ページを開くと配列サイズの入力ダイアログ（cin相当）が出ます。100000 くらいがおすすめです。</p>
+<p>※ブラウザでは<code>performance.now()</code>の精度がセキュリティ対策で粗くなるため、μs表示でも実際の刻みはNode.jsより大きくなります。</p>
+<button onclick="document.getElementById('output').textContent=''; main();">もう一度実行</button>
+<pre id="output"></pre>
+<script src="BigSort2.js"></script>
+</body>
+</html>
