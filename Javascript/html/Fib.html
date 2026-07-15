@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Fib</title>
+<style>
+    body { font-family: sans-serif; margin: 2em; }
+    pre  { background: #f4f4f4; padding: 1em; border-radius: 6px; white-space: pre-wrap; }
+    a    { text-decoration: none; }
+    button { font-size: 1em; padding: 0.4em 1.5em; margin-top: 0.5em; }
+    textarea { font-size: 1em; }
+</style>
+</head>
+<body>
+<p><a href="index.html">&larr; 一覧に戻る</a></p>
+<h1>Fib</h1>
+
+
+<p>プログラムへの入力（cin 相当）: 下の欄に <b>1行に1つずつ</b>、実行前に書いておいてください。<br>
+欄が空のときは入力ダイアログ（prompt）を使います。
+<b>VSCode内蔵ブラウザはダイアログが出ないため、必ずこの欄を使ってください。</b></p>
+<textarea id="stdin" rows="3" cols="30" placeholder="例:&#10;100&#10;7"></textarea>
+<br>
+
+<button onclick="window._stdin=null; document.getElementById('output').textContent=''; main();">実行</button>
+<pre id="output"></pre>
+<script src="../Fib.js"></script>
+</body>
+</html>

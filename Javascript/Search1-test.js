@@ -1,10 +1,21 @@
-// ====== 共通の入力機能（変更しない）======
-// Node.js・ブラウザ両対応の同期入力（C++の cin >> 相当）
-// Node.jsでは標準入力から1行だけ読み、ブラウザでは入力ダイアログを出す
-const input = (typeof window !== 'undefined')
-    ? (msg) => window.prompt(msg)
-    : (msg) => {
-        process.stdout.write(msg);
+// ====== 共通の入出力機能（変更しない）======
+// Node.js・ブラウザ両対応の入出力
+// print(s)  : C++の cout << 相当（改行なし出力）
+// input(msg): C++の cin >> 相当（同期入力）
+const isNode = (typeof window === 'undefined');
+
+function print(s) {
+    if (isNode) {
+        process.stdout.write(String(s));
+    } else {
+        // appendChild(createTextNode) は追記のたびに全文をコピーしないため大量出力でも速い
+        document.getElementById('output').appendChild(document.createTextNode(String(s)));
+    }
+}
+
+function input(msg) {
+    if (isNode) {
+        print(msg);
         const fs = require('fs');
         const buf = Buffer.alloc(1);
         const bytes = [];
@@ -21,8 +32,23 @@ const input = (typeof window !== 'undefined')
             bytes.push(buf[0]);
         }
         return Buffer.from(bytes).toString('utf-8').trim();
-    };
-// ========================================
+    } else {
+        // ページに入力欄（id="stdin"）があり値が入っていれば、そこから1行ずつ読む
+        // （VSCode内蔵ブラウザなど prompt() のダイアログが出ない環境向け）
+        const box = document.getElementById('stdin');
+        if (box && box.value.trim() !== '') {
+            if (!window._stdin) window._stdin = { lines: box.value.split('\n'), pos: 0 };
+            const ans = (window._stdin.pos < window._stdin.lines.length)
+                ? window._stdin.lines[window._stdin.pos++].trim() : '';
+            print(msg + ans + "\n");                // 端末のエコーの代わりに出力欄にも残す
+            return ans;
+        }
+        const ans = window.prompt(msg);
+        print(msg + ans + "\n");                    // 端末のエコーの代わりに出力欄にも残す
+        return ans;
+    }
+}
+// ==========================================
 
 function main() {
     const s = [3, 5, 2, 8, 7, 1, 9, 0, 10, 4];
@@ -32,11 +58,11 @@ function main() {
 
     for (let i = 0; i < N; i++) {
         if (d === s[i]) {
-            process.stdout.write("Found at: " + i + "\n");
+            print("Found at: " + i + "\n");
             return;
         }
     }
-    process.stdout.write("I can't find\n");
+    print("I can't find\n");
 }
 
-main();
+if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ

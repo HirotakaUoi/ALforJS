@@ -1,10 +1,21 @@
-// ====== 共通の入力機能（変更しない）======
-// Node.js・ブラウザ両対応の同期入力（C++の cin >> 相当）
-// Node.jsでは標準入力から1行だけ読み、ブラウザでは入力ダイアログを出す
-const input = (typeof window !== 'undefined')
-    ? (msg) => window.prompt(msg)
-    : (msg) => {
-        process.stdout.write(msg);
+// ====== 共通の入出力機能（変更しない）======
+// Node.js・ブラウザ両対応の入出力
+// print(s)  : C++の cout << 相当（改行なし出力）
+// input(msg): C++の cin >> 相当（同期入力）
+const isNode = (typeof window === 'undefined');
+
+function print(s) {
+    if (isNode) {
+        process.stdout.write(String(s));
+    } else {
+        // appendChild(createTextNode) は追記のたびに全文をコピーしないため大量出力でも速い
+        document.getElementById('output').appendChild(document.createTextNode(String(s)));
+    }
+}
+
+function input(msg) {
+    if (isNode) {
+        print(msg);
         const fs = require('fs');
         const buf = Buffer.alloc(1);
         const bytes = [];
@@ -21,14 +32,34 @@ const input = (typeof window !== 'undefined')
             bytes.push(buf[0]);
         }
         return Buffer.from(bytes).toString('utf-8').trim();
-    };
-// ========================================
+    } else {
+        // ページに入力欄（id="stdin"）があり値が入っていれば、そこから1行ずつ読む
+        // （VSCode内蔵ブラウザなど prompt() のダイアログが出ない環境向け）
+        const box = document.getElementById('stdin');
+        if (box && box.value.trim() !== '') {
+            if (!window._stdin) window._stdin = { lines: box.value.split('\n'), pos: 0 };
+            const ans = (window._stdin.pos < window._stdin.lines.length)
+                ? window._stdin.lines[window._stdin.pos++].trim() : '';
+            print(msg + ans + "\n");                // 端末のエコーの代わりに出力欄にも残す
+            return ans;
+        }
+        const ans = window.prompt(msg);
+        print(msg + ans + "\n");                    // 端末のエコーの代わりに出力欄にも残す
+        return ans;
+    }
+}
+// ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
 
-// C++のclock()相当：process.hrtime.bigint()（ナノ秒）をマイクロ秒に変換して返す
+// C++のclock()相当：マイクロ秒を返す（Node.js・ブラウザ両対応）
+// Node.js: process.hrtime.bigint()（ナノ秒）を換算（μs精度）
+// ブラウザ: performance.now()（ミリ秒）を換算（セキュリティ対策で精度は粗め）
 const CLOCKS_PER_SEC = 1000000;
-function clock() { return process.hrtime.bigint() / 1000n; }
+function clock() {
+    if (isNode) return Number(process.hrtime.bigint() / 1000n);
+    return Math.round(performance.now() * 1000);
+}
 
 function bubbleSort(s, N) {
     let temp;
@@ -45,9 +76,9 @@ function selectionSort(s, N) {
     let min, temp;
     for (let i = 0; i < N - 1; i++) {
         //		for (let k=0; k<N; k++) {
-        //			process.stdout.write(s[k] + " ");
+        //			print(s[k] + " ");
         //		}
-        //		process.stdout.write("\n");
+        //		print("\n");
         min = i;
         for (let j = i + 1; j < N; j++)
             if (s[min] > s[j]) min = j;
@@ -61,9 +92,9 @@ function insertionSort(s, N) {
     let j, temp;
     for (let i = 0; i < N - 1; i++) {
         //		for (let k=0; k<N; k++) {
-        //			process.stdout.write(s[k] + " ");
+        //			print(s[k] + " ");
         //		}
-        //		process.stdout.write("\n");
+        //		print("\n");
         j = i + 1;
         while ((j > 0) && (s[j - 1] > s[j])) {
             temp = s[j];
@@ -134,9 +165,9 @@ function mergeSort(s, N) {
         }
         for (i = 0; i < N; i++) s[i] = b[i];
         //		for (let p=0; p<N; p++) {
-        //			process.stdout.write(s[p] + " ");
+        //			print(s[p] + " ");
         //		}
-        //		process.stdout.write("msize= " + msize + "\n");
+        //		print("msize= " + msize + "\n");
         // ================  0 =============
         msize *= 2;
     }
@@ -193,18 +224,18 @@ function heapSort(s, N) {
     for (i = 1; i < N; i++) {
         insertHeap(s, i);
         //		for (let k=0; k<N; k++) {
-        //			process.stdout.write(s[k] + " ");
+        //			print(s[k] + " ");
         //		}
-        //		process.stdout.write("\n");
+        //		print("\n");
     }
 
     for (i = 0; i < N - 1; i++) {
         swap(s, 0, N - 1 - i);
         rebuildHeap(s, N - 1 - i);
         //		for (let k=0; k<N; k++) {
-        //			process.stdout.write(s[k] + " ");
+        //			print(s[k] + " ");
         //		}
-        //		process.stdout.write("\n");
+        //		print("\n");
     }
 }
 
@@ -212,13 +243,13 @@ function qsort(s, first, last) {
     let pivot, i, j, temp;
 
     //		for (let k=first; k<=last; k++) {
-    //			process.stdout.write(s[k] + " ");
+    //			print(s[k] + " ");
     //		}
-    //		process.stdout.write("first= " + first + " last= " + last + "\n");
+    //		print("first= " + first + " last= " + last + "\n");
 
     if (first < last) {
         pivot = s[last];
-        //			process.stdout.write("Pivot=" + pivot + "\n");
+        //			print("Pivot=" + pivot + "\n");
         i = first;
         j = last - 1;
         while (true) {
@@ -228,7 +259,7 @@ function qsort(s, first, last) {
             while ((j >= first) && (s[j] > pivot)) {
                 j -= 1;
             }
-            //			process.stdout.write("i= " + i + "j= " + j + "\n");
+            //			print("i= " + i + "j= " + j + "\n");
             if (i >= j) {
                 break;
             }
@@ -243,13 +274,13 @@ function qsort(s, first, last) {
         s[last] = temp;
 
         //	for (let k=first; k<i; k++) {
-        //		process.stdout.write(s[k] + " ");
+        //		print(s[k] + " ");
         //	}
-        //	process.stdout.write(" Pivot=" + s[i] + " ");
+        //	print(" Pivot=" + s[i] + " ");
         //	for (let k=i+1; k<=last; k++) {
-        //		process.stdout.write(s[k] + " ");
+        //		print(s[k] + " ");
         //	}
-        //	process.stdout.write("\n");
+        //	print("\n");
 
         qsort(s, first, i - 1);
         qsort(s, i + 1, last);
@@ -280,9 +311,9 @@ function combSort(s, N) {
             h = Math.floor(h * 10 / 13);
         }
         // for (let k=0; k<N; k++) {
-        //     process.stdout.write(s[k] + " ");
+        //     print(s[k] + " ");
         // }
-        // process.stdout.write("\n");
+        // print("\n");
     }
 }
 
@@ -303,72 +334,72 @@ function main() {
             (rand() % 10000000);
     }
     //	for (let k=0; k<N; k++) {
-    //		process.stdout.write(s[k] + " ");
+    //		print(s[k] + " ");
     //	}
-    //	process.stdout.write("\n");
+    //	print("\n");
 
-    process.stdout.write("1/" + CLOCKS_PER_SEC + "sec unit\n");
+    print("1/" + CLOCKS_PER_SEC + "sec unit\n");
 
     let startTime = clock();
-    process.stdout.write("QuickSort Start:  " + startTime + "\n");
+    print("QuickSort Start:  " + startTime + "\n");
     quickSort(s, N);
     let endTime = clock();
-    process.stdout.write("QuickSort End:    " + endTime + "\n");
-    process.stdout.write("Processing Time = " + (endTime - startTime) + " μs\n\n");
+    print("QuickSort End:    " + endTime + "\n");
+    print("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
     startTime = clock();
-    process.stdout.write("CombSort Start: " + startTime + "\n");
+    print("CombSort Start: " + startTime + "\n");
     combSort(z, N);
     endTime = clock();
-    process.stdout.write("CombSort End:   " + endTime + "\n");
-    process.stdout.write("Processing Time = " + (endTime - startTime) + " μs\n\n");
+    print("CombSort End:   " + endTime + "\n");
+    print("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
     startTime = clock();
-    process.stdout.write("HeapSort Start:   " + startTime + "\n");
+    print("HeapSort Start:   " + startTime + "\n");
     heapSort(t, N);
     endTime = clock();
-    process.stdout.write("HeapSort End:     " + endTime + "\n");
-    process.stdout.write("Processing Time = " + (endTime - startTime) + " μs\n\n");
+    print("HeapSort End:     " + endTime + "\n");
+    print("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
     startTime = clock();
-    process.stdout.write("MergeSort Start:  " + startTime + "\n");
+    print("MergeSort Start:  " + startTime + "\n");
     mergeSort(u, N);
     endTime = clock();
-    process.stdout.write("MergeSort End:    " + endTime + "\n");
-    process.stdout.write("Processing Time = " + (endTime - startTime) + " μs\n\n");
+    print("MergeSort End:    " + endTime + "\n");
+    print("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
     startTime = clock();
-    process.stdout.write("ShellSort Start:  " + startTime + "\n");
+    print("ShellSort Start:  " + startTime + "\n");
     shellSort(v, N);
     endTime = clock();
-    process.stdout.write("ShellSort End:    " + endTime + "\n");
-    process.stdout.write("Processing Time = " + (endTime - startTime) + " μs\n\n");
+    print("ShellSort End:    " + endTime + "\n");
+    print("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
     // startTime = clock();
-    // process.stdout.write("InsertionSort Start: " + startTime + "\n");
+    // print("InsertionSort Start: " + startTime + "\n");
     // insertionSort(w, N);
     // endTime = clock();
-    // process.stdout.write("InsertionSort End:   " + endTime + "\n");
-    // process.stdout.write("Processing Time =    " + (endTime - startTime) + " μs\n\n");
+    // print("InsertionSort End:   " + endTime + "\n");
+    // print("Processing Time =    " + (endTime - startTime) + " μs\n\n");
 
     // startTime = clock();
-    // process.stdout.write("SelectionSort Start: " + startTime + "\n");
+    // print("SelectionSort Start: " + startTime + "\n");
     // selectionSort(x, N);
     // endTime = clock();
-    // process.stdout.write("SelectionSort End:   " + endTime + "\n");
-    // process.stdout.write("Processing Time =    " + (endTime - startTime) + " μs\n\n");
+    // print("SelectionSort End:   " + endTime + "\n");
+    // print("Processing Time =    " + (endTime - startTime) + " μs\n\n");
 
     // startTime = clock();
-    // process.stdout.write("BubbleSort Start: " + startTime + "\n");
+    // print("BubbleSort Start: " + startTime + "\n");
     // bubbleSort(y, N);
     // endTime = clock();
-    // process.stdout.write("BubbleSort End:   " + endTime + "\n");
-    // process.stdout.write("Processing Time = " + (endTime - startTime) + " μs\n\n");
+    // print("BubbleSort End:   " + endTime + "\n");
+    // print("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
     //	for (let k=0; k<N; k++) {
-    //		process.stdout.write(s[k] + " ");
+    //		print(s[k] + " ");
     //	}
-    //	process.stdout.write("\n");
+    //	print("\n");
 }
 
-main();
+if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ

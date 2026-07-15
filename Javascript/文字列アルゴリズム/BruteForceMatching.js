@@ -1,10 +1,21 @@
-// ====== 共通の入力機能（変更しない）======
-// Node.js・ブラウザ両対応の同期入力（C++の cin >> 相当）
-// Node.jsでは標準入力から1行だけ読み、ブラウザでは入力ダイアログを出す
-const input = (typeof window !== 'undefined')
-    ? (msg) => window.prompt(msg)
-    : (msg) => {
-        process.stdout.write(msg);
+// ====== 共通の入出力機能（変更しない）======
+// Node.js・ブラウザ両対応の入出力
+// print(s)  : C++の cout << 相当（改行なし出力）
+// input(msg): C++の cin >> 相当（同期入力）
+const isNode = (typeof window === 'undefined');
+
+function print(s) {
+    if (isNode) {
+        process.stdout.write(String(s));
+    } else {
+        // appendChild(createTextNode) は追記のたびに全文をコピーしないため大量出力でも速い
+        document.getElementById('output').appendChild(document.createTextNode(String(s)));
+    }
+}
+
+function input(msg) {
+    if (isNode) {
+        print(msg);
         const fs = require('fs');
         const buf = Buffer.alloc(1);
         const bytes = [];
@@ -21,15 +32,30 @@ const input = (typeof window !== 'undefined')
             bytes.push(buf[0]);
         }
         return Buffer.from(bytes).toString('utf-8').trim();
-    };
-// ========================================
+    } else {
+        // ページに入力欄（id="stdin"）があり値が入っていれば、そこから1行ずつ読む
+        // （VSCode内蔵ブラウザなど prompt() のダイアログが出ない環境向け）
+        const box = document.getElementById('stdin');
+        if (box && box.value.trim() !== '') {
+            if (!window._stdin) window._stdin = { lines: box.value.split('\n'), pos: 0 };
+            const ans = (window._stdin.pos < window._stdin.lines.length)
+                ? window._stdin.lines[window._stdin.pos++].trim() : '';
+            print(msg + ans + "\n");                // 端末のエコーの代わりに出力欄にも残す
+            return ans;
+        }
+        const ans = window.prompt(msg);
+        print(msg + ans + "\n");                    // 端末のエコーの代わりに出力欄にも残す
+        return ans;
+    }
+}
+// ==========================================
 
 function BruteForce(p, s) {
     let matched;
     for (let i = 0; i <= s.length - p.length; i++) {
         matched = true;
         for (let j = 0; j < p.length; j++) {
-            process.stdout.write("s[" + (i + j) + "]=" + s[i + j] + ",  p[" + j + "]=" + p[j] + "\n");
+            print("s[" + (i + j) + "]=" + s[i + j] + ",  p[" + j + "]=" + p[j] + "\n");
             if (s[i + j] !== p[j]) {
                 matched = false;
                 break;
@@ -43,13 +69,13 @@ function BruteForce(p, s) {
 function main() {
     const p = input("Input pattern string: ");
     const s = input("Input string: ");
-    process.stdout.write("0123456789012345678901234567890123456789\n");
-    process.stdout.write(s + "\n");
+    print("0123456789012345678901234567890123456789\n");
+    print(s + "\n");
     const result = BruteForce(p, s);
     if (result === -1)
-        process.stdout.write("Pattern not matched!\n");
+        print("Pattern not matched!\n");
     else
-        process.stdout.write("Pattern matched! at " + result + "\n");
+        print("Pattern matched! at " + result + "\n");
 }
 
-main();
+if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
