@@ -10,6 +10,8 @@
   - `文字列アルゴリズム/` — BoyerMoore / BruteForceMatching / KMPMatching
   - `html/` — ブラウザ実行用ページ（全プログラム分を自動生成。`index.html` が一覧）
   - `両対応サンプル/` — 両対応方式の初期試作（QuickSort1 / BSearch1 / BigSort2 の .js + .html）。本体が両対応になったので参考用
+- `Node/` — `Javascript/` から自動生成した Node.js専用版（全45本、ブラウザ分岐を除去）。`Javascript/` は両対応版のまま維持し、`Node/` はその派生
+  - 再生成: `node tools/build-node.js`（`Javascript/` 側を修正したら実行し直す。手動で直接編集しない）
 
 ## 移植の約束事
 
@@ -28,11 +30,33 @@
 ## 実行方法
 
 - `node Javascript/<ファイル名>.js` — 対話入力・パイプ入力（`echo "5" | node ...`）両方可
+- `node Node/<ファイル名>.js` — 上と同じだが Node.js専用版（ブラウザ分岐なし）
 - ブラウザ: `Javascript/html/index.html` をダブルクリック → 一覧から選んで実行（サーバー不要）
 
 ---
 
 ## 作業引き継ぎログ
+
+### 2026-07-31
+
+**やったこと：**
+
+1. `Javascript/`（両対応版）から Node.js専用版を生成する `Node/` フォルダを新設（全45本）
+   - 共通入出力ブロックからブラウザ分岐（`window.prompt` / `document.getElementById` 等）を除去
+   - BigSort2.js の `clock()` から `performance.now()` 分岐を除去（Node の `hrtime.bigint()` のみに）
+   - 末尾の `if (isNode) main();` を `main();` に
+   - 生成スクリプト: `tools/build-node.js`（`Javascript/` を直接コピー元とし、`両対応サンプル/` と `html/` は対象外）
+   - `Javascript/` 側は両対応版のまま変更なし。`Node/` を再生成する場合は `node tools/build-node.js` を実行
+
+**次回への注意：**
+
+- このセッションの実行環境に Node.js が入っておらず、`tools/build-node.js` 自体は未実行（作れなかった）。
+  同ロジックを Python で再実装して `Node/` の45ファイルを生成・検証済み（本文の差分は共通ブロックとclock()と末尾行のみで、
+  ロジック部分はJavascript/側とバイト単位で一致することを確認、丸括弧・波カッコの対応も全数チェック済み）
+- `tools/build-node.js` はPython版と同じロジックで書き直したが、Node.js環境で一度も実行できていない。
+  次回 node が使える環境で `node tools/build-node.js` を実行し、既存の `Node/` の内容と一致するか確認するとより安全
+- `Javascript/BubbleSort1.js` / `BubbleSort2.js` / `Search1.js` の3本は前セッションから未コミットのまま
+  （共通ブロックがprettier風に整形されている以外は機能的に他42本と同一。方針未確認）
 
 ### 2026-07-14
 
