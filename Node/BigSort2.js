@@ -1,4 +1,4 @@
-// ====== 共通の入出力機能（Node.js専用）======
+// ====== 共通の入出力機能（Node.js専用・ASCII入力前提）======
 // print(s)  : C++の cout << 相当（改行なし出力）
 // input(msg): C++の cin >> 相当（同期入力）
 function print(s) {
@@ -9,7 +9,7 @@ function input(msg) {
     print(msg);
     const fs = require('fs');
     const buf = Buffer.alloc(1);
-    const bytes = [];
+    let line = '';
     while (true) {
         let n;
         try {
@@ -20,9 +20,9 @@ function input(msg) {
         }
         if (n === 0) break;                     // EOF
         if (buf[0] === 10) break;               // '\n' が来たら1行の終わり
-        bytes.push(buf[0]);
+        line += String.fromCharCode(buf[0]);
     }
-    return Buffer.from(bytes).toString('utf-8').trim();
+    return line.trim();
 }
 // ==========================================
 
