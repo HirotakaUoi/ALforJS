@@ -1,36 +1,25 @@
-// ====== 共通の入出力機能（Node.js専用・ASCII入力前提）======
+// ====== 共通の入出力機能（Node.js専用・readline使用）======
 // print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（同期入力）
+// input(msg): C++の cin >> 相当（内部で readline の Promise を await して返す。呼び出し側は await input(...)）
+const readline = require('readline/promises');
+
 function print(s) {
     process.stdout.write(String(s));
 }
 
-function input(msg) {
-    print(msg);
-    const fs = require('fs');
-    const buf = Buffer.alloc(1);
-    let line = '';
-    while (true) {
-        let n;
-        try {
-            n = fs.readSync(0, buf, 0, 1);      // 1バイトずつ読む
-        } catch (e) {
-            if (e.code === 'EAGAIN') continue;  // パイプでまだデータが来ていない間は待つ
-            throw e;
-        }
-        if (n === 0) break;                     // EOF
-        if (buf[0] === 10) break;               // '\n' が来たら1行の終わり
-        line += String.fromCharCode(buf[0]);
-    }
+async function input(msg) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const line = await rl.question(msg);
+    rl.close();
     return line.trim();
 }
 // ==========================================
 
-function main() {
+async function main() {
     const s = [3, 5, 2, 8, 7, 1, 9, 0, 10, 4];
     const N = 10;
 
-    const d = parseInt(input("Input: "), 10);
+    const d = parseInt(await input("Input: "), 10);
 
     for (let i = 0; i < N; i++) {
         if (d === s[i]) {

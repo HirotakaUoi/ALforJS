@@ -1,8 +1,9 @@
 // Javascript/ の両対応版（Node.js・ブラウザ両対応）から、Node.js専用版を生成して Node/ に出力する
-// - 共通の入出力ブロック（print/input）からブラウザ分岐を除去
+// - 共通の入出力ブロックを Node専用に置き換え。input() は readline/promises を await する非同期版
+//   （input() を呼ぶ main() だけ async 化し、呼び出し箇所に await を付与。input()を使わないファイルは変更なし）
 // - BigSort2.js の clock() からブラウザ分岐（performance.now）を除去
-// - 末尾の `if (isNode) main();` を `main();` に
-// 対象外: 両対応サンプル/（旧方式の参考用プロトタイプ）、html/（ブラウザ実行ページ）
+// - 末尾の `if (isNode) main();` を `main();` に（async化しても呼び出し方は変えない。他の非同期ファイルと同じ流儀）
+// 対象外: 両対応サンプル/（旧方式の参考用プロトタイプ）、html/（ブラウザ実行ページ）、p5/（別件・作業中）
 // 再生成する場合: node tools/build-node.js
 const fs = require('fs');
 const path = require('path');
@@ -11,30 +12,19 @@ const SRC_ROOT = path.join(__dirname, '..', 'Javascript');
 const DEST_ROOT = path.join(__dirname, '..', 'Node');
 const EXCLUDE_DIRS = new Set(['html', '両対応サンプル', 'p5'].map(s => s.normalize('NFC')));
 
-const NODE_IO_BLOCK = `// ====== 共通の入出力機能（Node.js専用・ASCII入力前提）======
+const NODE_IO_BLOCK = `// ====== 共通の入出力機能（Node.js専用・readline使用）======
 // print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（同期入力）
+// input(msg): C++の cin >> 相当（内部で readline の Promise を await して返す。呼び出し側は await input(...)）
+const readline = require('readline/promises');
+
 function print(s) {
     process.stdout.write(String(s));
 }
 
-function input(msg) {
-    print(msg);
-    const fs = require('fs');
-    const buf = Buffer.alloc(1);
-    let line = '';
-    while (true) {
-        let n;
-        try {
-            n = fs.readSync(0, buf, 0, 1);      // 1バイトずつ読む
-        } catch (e) {
-            if (e.code === 'EAGAIN') continue;  // パイプでまだデータが来ていない間は待つ
-            throw e;
-        }
-        if (n === 0) break;                     // EOF
-        if (buf[0] === 10) break;               // '\n' が来たら1行の終わり
-        line += String.fromCharCode(buf[0]);
-    }
+async function input(msg) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const line = await rl.question(msg);
+    rl.close();
     return line.trim();
 }
 // ==========================================
@@ -52,12 +42,26 @@ function clock() {
 `;
 
 function transform(src, file) {
-    if (!IO_BLOCK_RE.test(src)) throw new Error('共通入出力ブロックが見つからない: ' + file);
+    const blockMatch = IO_BLOCK_RE.exec(src);
+    if (!blockMatch) throw new Error('共通入出力ブロックが見つからない: ' + file);
+    const bodyBefore = src.slice(blockMatch.index + blockMatch[0].length);
+    const usesInput = /\binput\(/.test(bodyBefore);
+
     src = src.replace(IO_BLOCK_RE, NODE_IO_BLOCK);
 
     if (src.includes('function clock()')) {
         if (!CLOCK_DUAL_RE.test(src)) throw new Error('clock()の両対応ブロックが見つからない: ' + file);
         src = src.replace(CLOCK_DUAL_RE, NODE_CLOCK);
+    }
+
+    if (usesInput) {
+        if (!/^function main\(\) \{/m.test(src)) throw new Error('main()が見つからない: ' + file);
+        src = src.replace(/^function main\(\) \{/m, 'async function main() {');
+
+        const idx = src.indexOf(NODE_IO_BLOCK) + NODE_IO_BLOCK.length;
+        const head = src.slice(0, idx);
+        const rest = src.slice(idx).replace(/\binput\(/g, 'await input(');
+        src = head + rest;
     }
 
     if (!src.includes('if (isNode) main();')) throw new Error('末尾の main() 呼び出しが見つからない: ' + file);
