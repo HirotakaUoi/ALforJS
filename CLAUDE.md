@@ -12,6 +12,10 @@
   - `両対応サンプル/` — 両対応方式の初期試作（QuickSort1 / BSearch1 / BigSort2 の .js + .html）。本体が両対応になったので参考用
 - `Node/` — `Javascript/` から自動生成した Node.js専用版（全45本、ブラウザ分岐を除去）。`Javascript/` は両対応版のまま維持し、`Node/` はその派生
   - 再生成: `node tools/build-node.js`（`Javascript/` 側を修正したら実行し直す。手動で直接編集しない）
+  - `input()` は標準モジュール `readline/promises` を使う非同期版（`fs.readSync`のバイトループではない）
+    - `input()` を呼ぶファイル（21本）だけ `main()` を `async` 化し、呼び出し箇所は `await input(...)`
+    - `input()` を呼ばないファイル（24本）は無変更のまま同期の `main()` （`input()`定義自体は共通ブロックとして残るが未使用）
+    - 末尾は async化していても `main();` の素呼び出しのまま（`QuickSort1P.js`/`QuickSort11P.js`と同じ流儀。`.catch`等のエラー処理は付けない）
 
 ## 移植の約束事
 
@@ -36,6 +40,32 @@
 ---
 
 ## 作業引き継ぎログ
+
+### 2026-08-02
+
+**やったこと：**
+
+1. `Node/` の `input()` を2段階で見直し
+   - まず ASCII入力前提でバイト配列＋`Buffer.from().toString('utf-8')`をやめ、
+     1バイトずつ文字列へ直接連結する方式に簡略化
+   - さらに標準モジュール `readline/promises` を使う非同期版に変更（`fs.readSync`のバイトループ自体を廃止）
+     - `input()` を呼ぶ21本のみ `main()` を `async` 化し、呼び出し箇所を `await input(...)` に
+     - 呼ばない24本は無変更。`QuickSort1P.js`/`QuickSort11P.js`は元々asyncなので影響なし
+     - 末尾は async化後も `main();` の素呼び出しのまま（エラーハンドリングは付けない、既存の流儀を踏襲）
+   - `tools/build-node.js` を都度更新し、`Node/` 全45本を再生成
+2. `Javascript/p5/`（p5.js関連、`common/viz.js`など）という未追跡の作業中フォルダを発見
+   - ユーザー確認の上、放置と判断。`tools/build-node.js` の生成対象からは除外（`html/`・`両対応サンプル/`と同様）
+3. リモート `albyjs4cc`（https://github.com/HirotakaUoi/ALbyJS4CC.git）を一時追加してpushしたが、
+   ユーザーが「origin(ALforJS)と重複していた」と気づき削除。以降 origin のみ使用
+
+**次回への注意：**
+
+- このセッションの実行環境に Node.js が入っておらず、`tools/build-node.js` は一度も実際には実行できていない
+  （同ロジックをPythonで再実装して検証・生成。次回nodeが使える環境で一度 `node tools/build-node.js` を実行し、
+  既存の `Node/` と一致するか確認するとより安全）
+- `Javascript/BubbleSort1.js` / `BubbleSort2.js` / `Search1.js` の3本は前々セッションから未コミットのまま
+  （共通ブロックがprettier風に整形されている以外は機能的に他42本と同一。方針未確認）
+- `Javascript/p5/` は今回のNode/生成対象外のまま。ユーザーが別途作業中なので触らないこと
 
 ### 2026-07-31
 
