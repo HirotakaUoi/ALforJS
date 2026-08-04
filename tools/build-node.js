@@ -1,8 +1,11 @@
 // Javascript/ の両対応版（Node.js・ブラウザ両対応）から、Node.js専用版を生成して Node/ に出力する
-// - 共通の入出力ブロックを Node専用に置き換え。input() は readline/promises を await する非同期版
-//   （input() を呼ぶ main() だけ async 化し、呼び出し箇所に await を付与。input()を使わないファイルは変更なし）
+// - 共通の入出力ブロックを Node専用に置き換え（全45ファイル完全に同一のブロック）
+//   readline.Interface をファイル冒頭で1つだけ作り、非同期イテレータで1行ずつ受け取る方式。
+//   （rl.question()を呼び出しごとに作り直す方式は、複数行を一度にパイプ入力した際に
+//    2回目以降が読めなくなる不具合があったため不採用。asyncIterator方式で解消を確認済み）
+// - 全ファイル一律 main() を async 化し、末尾は `main().finally(() => rl.close());` に統一
+//   （input()を使わないファイルでも rl を確実に閉じないと、対話実行時にプロセスが終了しなくなるため）
 // - BigSort2.js の clock() からブラウザ分岐（performance.now）を除去
-// - 末尾の `if (isNode) main();` を `main();` に（async化しても呼び出し方は変えない。他の非同期ファイルと同じ流儀）
 // 対象外: 両対応サンプル/（旧方式の参考用プロトタイプ）、html/（ブラウザ実行ページ）、p5/（別件・作業中）
 // 再生成する場合: node tools/build-node.js
 const fs = require('fs');
@@ -14,18 +17,19 @@ const EXCLUDE_DIRS = new Set(['html', '両対応サンプル', 'p5'].map(s => s.
 
 const NODE_IO_BLOCK = `// ====== 共通の入出力機能（Node.js専用・readline使用）======
 // print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（内部で readline の Promise を await して返す。呼び出し側は await input(...)）
-const readline = require('readline/promises');
+// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, terminal: false });
+const _lines = rl[Symbol.asyncIterator]();
 
 function print(s) {
     process.stdout.write(String(s));
 }
 
 async function input(msg) {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const line = await rl.question(msg);
-    rl.close();
-    return line.trim();
+    print(msg);
+    const { value } = await _lines.next();
+    return (value ?? '').trim();
 }
 // ==========================================
 `;
@@ -42,11 +46,7 @@ function clock() {
 `;
 
 function transform(src, file) {
-    const blockMatch = IO_BLOCK_RE.exec(src);
-    if (!blockMatch) throw new Error('共通入出力ブロックが見つからない: ' + file);
-    const bodyBefore = src.slice(blockMatch.index + blockMatch[0].length);
-    const usesInput = /\binput\(/.test(bodyBefore);
-
+    if (!IO_BLOCK_RE.test(src)) throw new Error('共通入出力ブロックが見つからない: ' + file);
     src = src.replace(IO_BLOCK_RE, NODE_IO_BLOCK);
 
     if (src.includes('function clock()')) {
@@ -54,18 +54,18 @@ function transform(src, file) {
         src = src.replace(CLOCK_DUAL_RE, NODE_CLOCK);
     }
 
-    if (usesInput) {
-        if (!/^function main\(\) \{/m.test(src)) throw new Error('main()が見つからない: ' + file);
-        src = src.replace(/^function main\(\) \{/m, 'async function main() {');
+    // main() は全ファイル一律 async 化する（QuickSort1P/11P は元々asyncなのでこの正規表現はマッチしない）
+    if (!/^(async )?function main\(\) \{/m.test(src)) throw new Error('main()が見つからない: ' + file);
+    src = src.replace(/^function main\(\) \{/m, 'async function main() {');
 
-        const idx = src.indexOf(NODE_IO_BLOCK) + NODE_IO_BLOCK.length;
-        const head = src.slice(0, idx);
-        const rest = src.slice(idx).replace(/\binput\(/g, 'await input(');
-        src = head + rest;
-    }
+    // input() の呼び出し箇所（ブロックより後ろ）だけに await を付与
+    const idx = src.indexOf(NODE_IO_BLOCK) + NODE_IO_BLOCK.length;
+    const head = src.slice(0, idx);
+    const rest = src.slice(idx).replace(/\binput\(/g, 'await input(');
+    src = head + rest;
 
     if (!src.includes('if (isNode) main();')) throw new Error('末尾の main() 呼び出しが見つからない: ' + file);
-    src = src.replace(/if \(isNode\) main\(\);[^\n]*/, 'main();');
+    src = src.replace(/if \(isNode\) main\(\);[^\n]*/, 'main().finally(() => rl.close());');
 
     if (src.includes('isNode')) throw new Error('isNode の消し残しあり: ' + file);
     return src;

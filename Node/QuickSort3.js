@@ -1,17 +1,18 @@
 // ====== 共通の入出力機能（Node.js専用・readline使用）======
 // print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（内部で readline の Promise を await して返す。呼び出し側は await input(...)）
-const readline = require('readline/promises');
+// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, terminal: false });
+const _lines = rl[Symbol.asyncIterator]();
 
 function print(s) {
     process.stdout.write(String(s));
 }
 
 async function input(msg) {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const line = await rl.question(msg);
-    rl.close();
-    return line.trim();
+    print(msg);
+    const { value } = await _lines.next();
+    return (value ?? '').trim();
 }
 // ==========================================
 
@@ -76,7 +77,7 @@ function quickSort(s, N) {
 }
 
 
-function main() {
+async function main() {
 		// const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];  （元のC++では二重定義のためコメント化）
 //		const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
 	const s = [4, 5, 2, 11, 6, 10, 1, 9, 3, 0, -1, -2, 12];
@@ -93,4 +94,4 @@ function main() {
 	print("\n");
 }
 
-main();
+main().finally(() => rl.close());

@@ -10,12 +10,16 @@
   - `文字列アルゴリズム/` — BoyerMoore / BruteForceMatching / KMPMatching
   - `html/` — ブラウザ実行用ページ（全プログラム分を自動生成。`index.html` が一覧）
   - `両対応サンプル/` — 両対応方式の初期試作（QuickSort1 / BSearch1 / BigSort2 の .js + .html）。本体が両対応になったので参考用
+  - `playground/` — 対話中に一時停止してターミナル風に入力できる単一HTMLの試作（Generatorベース、Node不要）。現状 BSearch1.html のみ
+  - `p5/` — p5.js関連の別件・作業中（未追跡、`tools/build-node.js`の対象外）
 - `Node/` — `Javascript/` から自動生成した Node.js専用版（全45本、ブラウザ分岐を除去）。`Javascript/` は両対応版のまま維持し、`Node/` はその派生
   - 再生成: `node tools/build-node.js`（`Javascript/` 側を修正したら実行し直す。手動で直接編集しない）
-  - `input()` は標準モジュール `readline/promises` を使う非同期版（`fs.readSync`のバイトループではない）
-    - `input()` を呼ぶファイル（21本）だけ `main()` を `async` 化し、呼び出し箇所は `await input(...)`
-    - `input()` を呼ばないファイル（24本）は無変更のまま同期の `main()` （`input()`定義自体は共通ブロックとして残るが未使用）
-    - 末尾は async化していても `main();` の素呼び出しのまま（`QuickSort1P.js`/`QuickSort11P.js`と同じ流儀。`.catch`等のエラー処理は付けない）
+  - `input()` は標準モジュール `readline`（非promise版）を使う非同期版
+    - ファイル冒頭で `readline.Interface` を1つだけ作り、`rl[Symbol.asyncIterator]()` で1行ずつ受け取る
+    - `rl.question()` をその都度作り直す方式は、複数行を一度にパイプ入力すると2回目以降が読めなくなる不具合があったため不採用
+  - 共通ブロック・末尾行とも**全45ファイル完全に同一**（`input()`を使わないファイルも例外なく `async function main()` + `main().finally(() => rl.close());`）
+    - 未使用でも `rl` を確実に閉じないと対話実行時にプロセスが終了しなくなるため、使う/使わないで分岐させていない
+  - `Javascript/playground/` — 対話中に一時停止してターミナル風に入力できる単一HTMLの試作（Generatorベース、Node不要）。現状 BSearch1.html のみ
 
 ## 移植の約束事
 
@@ -40,6 +44,39 @@
 ---
 
 ## 作業引き継ぎログ
+
+### 2026-08-05
+
+**やったこと：**
+
+1. 実行環境に Node.js が使えるようになったので、`tools/build-node.js` を実際に実行して検証
+   - 前回セッションでPython代替生成した `Node/` と完全一致することを確認（生成ロジックの正しさを実機で裏付け）
+2. `Node/` の `input()`（`readline/promises` の `question()` を呼び出しごとに作り直す方式）に不具合を発見
+   - 症状: `printf "10\n5\n" | node Node/BigSearch1.js` のように複数行を一度にパイプすると、
+     2回目以降の `input()` が永久に応答を受け取れず、結果が出ないままプロセスが終了する
+   - 対話的に1行ずつ打つ場合や、1回だけの入力パイプ（`echo "5" | node ...`）は問題なし。
+     複数行を一度にまとめてパイプする場合のみ発生（自動テストや `printf` での一括投入で踏みやすい）
+   - 原因: `rl.question()` 用に `readline.Interface` を呼び出しごとに作り直すと、
+     パイプで既にバッファされている2行目以降を新しいインターフェースが受け取れない（Node側の挙動）
+   - 対策: `readline.Interface` をファイル冒頭で1つだけ作り、非同期イテレータ（`rl[Symbol.asyncIterator]()`）で
+     1行ずつ受け取る方式に変更。複数行一括パイプ・遅延パイプ（対話相当）の両方で修正確認済み
+   - ユーザー要望で「共通ブロックは全45ファイル完全に同一」を維持するため、
+     `input()`を使わない24本も含めて全ファイル一律 `async function main()` にし、
+     末尾を `main().finally(() => rl.close());` に統一（未使用でも`rl`を閉じないと対話実行時にハングするため）
+   - 全45本を実行して無エラー・exit 0、共通ブロック・末尾行のユニーク文字列が1種類のみであることを検証済み
+3. `Javascript/playground/BSearch1.html` を試作 — 単一HTMLでソースコード表示＋ターミナル風の実行パネル
+   - `input()`呼び出しで実行が一時停止し、ターミナル内の入力欄に打ってEnterで続きが動く体験
+   - 実現方式は Generator（`function* main()` + `yield* input(msg)`）。Web Worker + Atomics.wait も検討したが、
+     `SharedArrayBuffer`がクロスオリジン分離ヘッダー必須で `file://` 直開き・VSCode内蔵ブラウザでは動かない可能性が高く不採用
+   - print/input の「ライブラリ」関数もHTML内に埋め込み、ソース表示欄には実際に実行される関数をそのまま`toString()`して表示
+   - 対象はBSearch1のみの試作。他プログラムへの展開は未着手
+
+**次回への注意：**
+
+- `Javascript/BubbleSort1.js` / `BubbleSort2.js` / `Search1.js` の3本は依然未コミットのまま（方針未確認、据え置き）
+- `Javascript/p5/` は今回も触っていない（ユーザーが別途作業中）
+- `Javascript/playground/` は BSearch1.html のみの試作段階。45本への展開や `html/` との統合方針は未確定
+- リモートは origin（ALforJS）のみ。一時追加した albyjs4cc は前セッションで削除済み
 
 ### 2026-08-02
 

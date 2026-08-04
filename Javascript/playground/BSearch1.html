@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>BSearch1 プレイグラウンド</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f5f5f7;
+    --panel-bg: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --border: #d2d2d7;
+    --accent: #0071e3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e;
+      --panel-bg: #2c2c2e;
+      --text: #f5f5f7;
+      --muted: #a1a1a6;
+      --border: #48484a;
+      --accent: #409cff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 4px;
+  }
+  p.note {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+  .panes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  section {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    flex: 1 1 420px;
+    min-width: 320px;
+  }
+  section h2 {
+    font-size: 14px;
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  pre#source {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    max-height: 480px;
+    overflow: auto;
+  }
+  #terminal {
+    background: #000;
+    color: #d4d4d4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 12px;
+    border-radius: 6px;
+    height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .term-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #7CFC00;
+    font-family: inherit;
+    font-size: inherit;
+    caret-color: #7CFC00;
+    width: 12ch;
+  }
+  .controls {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  button {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  button.secondary {
+    background: transparent;
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+
+<h1>BSearch1（二分探索）プレイグラウンド</h1>
+<p class="note">「実行」を押す（またはEnter）と開始。<code>input()</code>で止まったらターミナル内に入力欄が現れるので、値を打ってEnterで続きが実行されます。</p>
+
+<div class="panes">
+  <section class="code-pane">
+    <h2>ソースコード</h2>
+    <pre id="source"></pre>
+  </section>
+  <section class="terminal-pane">
+    <h2>実行</h2>
+    <div id="terminal" tabindex="0"></div>
+    <div class="controls">
+      <button id="runBtn">実行</button>
+      <button id="resetBtn" class="secondary" disabled>リセット</button>
+    </div>
+  </section>
+</div>
+
+<script>
+// ====== 共通の入出力機能（ターミナル・Generator版）======
+// print(s)  : C++の cout << 相当（改行なし出力）
+// input(msg): C++の cin >> 相当。yield で一時停止し、ターミナルの入力欄からの値を待つ
+//             （呼び出し側は yield* input(msg) の形で main() から呼ぶ）
+const term = document.getElementById('terminal');
+
+function print(s) {
+    term.appendChild(document.createTextNode(String(s)));
+    term.scrollTop = term.scrollHeight;
+}
+
+function* input(msg) {
+    const line = yield msg;
+    return line.trim();
+}
+// ==========================================
+
+function* main() {
+    let d, i, first, last, center;
+    const s = [0, 1, 2, 4, 5, 7, 8, 9];
+    const N = 8;
+    d = parseInt(yield* input("Input search number: "), 10);
+    first = 0;
+    last = N - 1;
+    while (first <= last) { 				 // 探索範囲が空でない間
+        print("First = " + first + ",Last = " + last + "\n");
+        center = Math.floor((first + last) / 2);  // 範囲の真ん中を計算
+        if (d === s[center]) {  				// 範囲の真ん中の値がｄと等しい
+            print("Found: " + d + " at index " + center + "\n");
+            return;
+        } else if (d < s[center]) {  		// 範囲の真ん中の値がｄより大きい
+            last = center - 1;       		// 範囲の後半分を省く
+        } else {  							// 範囲の真ん中の値がｄより小さい
+            first = center + 1;  			 // 範囲の前半分を省く
+        }
+    }
+    print("I can't find: " + d + "\n");
+}
+
+// ====== ここから下は実行用の駆動部（アルゴリズム本体ではない）======
+const runBtn = document.getElementById('runBtn');
+const resetBtn = document.getElementById('resetBtn');
+let gen = null;
+let waitingForInput = false;
+
+function showInputLine(promptText, onSubmit) {
+    print(promptText);
+    const box = document.createElement('input');
+    box.type = 'text';
+    box.className = 'term-input';
+    box.autocomplete = 'off';
+    box.spellcheck = false;
+    term.appendChild(box);
+    box.focus();
+    waitingForInput = true;
+    box.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        const val = box.value;
+        box.remove();
+        waitingForInput = false;
+        print(val + '\n');
+        onSubmit(val);
+    });
+    term.scrollTop = term.scrollHeight;
+}
+
+function step(res) {
+    if (res.done) {
+        runBtn.disabled = false;
+        resetBtn.disabled = true;
+        return;
+    }
+    showInputLine(res.value, (val) => step(gen.next(val)));
+}
+
+function run() {
+    runBtn.disabled = true;
+    resetBtn.disabled = false;
+    term.textContent = '';
+    gen = main();
+    step(gen.next());
+}
+
+function reset() {
+    runBtn.disabled = false;
+    resetBtn.disabled = true;
+    term.textContent = '';
+    gen = null;
+}
+
+runBtn.addEventListener('click', run);
+resetBtn.addEventListener('click', reset);
+
+document.addEventListener('keydown', (e) => {
+    // runBtn自体がフォーカスされている場合はボタンのネイティブなEnter動作に任せる（二重発火防止）
+    if (e.key === 'Enter' && !waitingForInput && !runBtn.disabled && e.target !== runBtn) {
+        run();
+    }
+});
+
+// ソースコード欄には、実際に実行される print/input/main をそのまま表示する
+document.getElementById('source').textContent =
+    print.toString() + '\n\n' +
+    input.toString() + '\n\n' +
+    main.toString();
+</script>
+
+</body>
+</html>
