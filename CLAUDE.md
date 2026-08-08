@@ -45,6 +45,39 @@
 
 ## 作業引き継ぎログ
 
+### 2026-08-08
+
+**やったこと：**
+
+1. `Javascript/BubbleSort1.js` / `BubbleSort2.js` / `Search1.js` の共通ブロックがさらに変化
+   - インデント2スペース・ダブルクォートへの整形（prettier風）に加え、今回は機能面でも変化あり
+     - `input()`のNode側：EAGAIN時のリトライ（`try/catch`でパイプ未到達データを待つ処理）を削除し、
+       単純な `while (fs.readSync(...) && buf[0] !== 10)` ループに簡略化
+     - `require('fs')` を関数内から出し、ファイル冒頭で `const fs = isNode ? require('fs') : null;` に
+     - `print()`のブラウザ側：`appendChild(createTextNode(...))` → `element.append(...)` に簡略化
+   - 正規の共通ブロック（他42本、例: `Javascript/BSearch1.js`）は変更前のまま（EAGAIN対応・appendChild方式を維持）で、
+     乖離は書式だけでなく挙動にも及ぶ状態になっている。**この3本の扱いは依然未確認・未コミットのまま据え置き**
+     （正規ブロックをこちらに合わせて`tools/transform.js`で全体更新するか、3本を正規ブロックに戻すか要判断）
+2. `Javascript/playground/BSearch1.html` を試作から汎用プレイグラウンドへ拡張
+   - タイトルを「BSearch1（二分探索）プレイグラウンド」→「アルゴリズム プレイグラウンド」に変更
+   - ソース欄を `<pre>`（表示のみ）から `<textarea>`（編集可能）に変更し、`実行`時に`eval`で反映
+   - `main`の3形態に対応：`function* main()`（input()で一時停止）／`async function main()`（並列スレッド模擬）／
+     通常の`function main()`（入力なし、SleepSort1のsetTimeoutもここに含む）。`kindOf()`で判別し駆動方法を切り替え
+   - SleepSort1のような「setTimeoutを仕掛けてすぐreturnする」プログラム対策として、実行世代（`runGeneration`）を導入
+     し、再実行・リセット時に古い世代のタイマー発火を無視するよう対応（`window.setTimeout`はグローバルのまま維持し、
+     ローカルの`const setTimeout`でラップすることで無限再帰を回避）
+   - 実行時エラー（構文エラー・実行時例外）をターミナルに表示するように対応（`finishWithError`）
+   - ソースコード欄には`main()`のみ表示（`print`/`input`は環境提供ライブラリとして非表示に）
+   - 引き続きBSearch1のみの試作段階。45本への展開や`html/`との統合方針は未確定
+
+**次回への注意：**
+
+- `Javascript/BubbleSort1.js` / `BubbleSort2.js` / `Search1.js` の共通ブロックの扱いを次回決める
+  （正規ブロックとの乖離が機能面にも拡大したため、放置期間が長引くほど「どちらが正か」の判断が難しくなる）
+- `Javascript/p5/` は今回も触っていない（ユーザーが別途作業中）
+- `Javascript/playground/` は BSearch1.html のみだが、任意のプログラムを貼り付けて動かせる汎用プレイグラウンドに近づいた。
+  他44本への展開や `html/` との統合方針は未確定
+
 ### 2026-08-05
 
 **やったこと：**
