@@ -3,47 +3,119 @@
 アルゴリズム教材プロジェクト。`C++` フォルダの C++ ソースコード（ソート・探索・文字列照合など約45本）を、
 名前・アルゴリズム・出力形式を変えずに JavaScript（Node.js）へ移植したもの。
 
+## 目標
+
+1. **アルゴリズムの本質部分はどの環境でも統一** — Node でもブラウザでも同じ書き方
+2. **Node版が授業のメイン実行環境** — VSCode で動かす（デバッグしやすいため）
+3. **サブ実行環境としてブラウザ版を併用** — コード欄に Node版をそのまま貼れば動く
+
+最終的にソースはスライドに表示する用途で、配布はしない。
+
 ## フォルダ構成
 
-- `C++/` — 元の C++ ソース（サブフォルダ `文字列アルゴリズム/` を含む）
-- `Javascript/` — 移植した JavaScript ソース（ファイル名は C++ と同名の `.js`、全ファイル Node.js・ブラウザ両対応）
+- `C++/` — 元の C++ ソース（参考用。**手を入れない**）
+- `Node/` — **標準版**。全45本＋共通ライブラリ。VSCode で動かすメイン環境
+  - `io.js` — 共通の入出力ライブラリ。`output` / `input` / `close` / `clock` / `CLOCKS_PER_SEC` を
+    `globalThis` に登録するので、各プログラムは `require("./io.js");` の1行だけで済む
   - `文字列アルゴリズム/` — BoyerMoore / BruteForceMatching / KMPMatching
-  - `html/` — ブラウザ実行用ページ（全プログラム分を自動生成。`index.html` が一覧）
-  - `両対応サンプル/` — 両対応方式の初期試作（QuickSort1 / BSearch1 / BigSort2 の .js + .html）。本体が両対応になったので参考用
-  - `playground/` — 対話中に一時停止してターミナル風に入力できる単一HTMLの試作（Generatorベース、Node不要）。現状 BSearch1.html のみ
-  - `p5/` — p5.js関連の別件・作業中（未追跡、`tools/build-node.js`の対象外）
-- `Node/` — `Javascript/` から自動生成した Node.js専用版（全45本、ブラウザ分岐を除去）。`Javascript/` は両対応版のまま維持し、`Node/` はその派生
-  - 再生成: `node tools/build-node.js`（`Javascript/` 側を修正したら実行し直す。手動で直接編集しない）
-  - `input()` は標準モジュール `readline`（非promise版）を使う非同期版
-    - ファイル冒頭で `readline.Interface` を1つだけ作り、`rl[Symbol.asyncIterator]()` で1行ずつ受け取る
-    - `rl.question()` をその都度作り直す方式は、複数行を一度にパイプ入力すると2回目以降が読めなくなる不具合があったため不採用
-  - 共通ブロック・末尾行とも**全45ファイル完全に同一**（`input()`を使わないファイルも例外なく `async function main()` + `main().finally(() => rl.close());`）
-    - 未使用でも `rl` を確実に閉じないと対話実行時にプロセスが終了しなくなるため、使う/使わないで分岐させていない
-  - `Javascript/playground/` — 対話中に一時停止してターミナル風に入力できる単一HTMLの試作（Generatorベース、Node不要）。現状 BSearch1.html のみ
+    - 同フォルダの `io.js` は `../io.js` への中継。これで共通ブロックが45本すべて同一になる
+  - `globals.d.ts` — エディタの補完用（実行には関与しない）
+- `Web/` — ブラウザ実行環境。`Node/` のソースを貼り付けて動かす
+  - `html.html` — **HTML版**。テキスト入出力のみ。外部ライブラリ不要でオフラインでも動く
+  - `p5.html` — **p5.js版**。HTML版＋描画キャンバス
+  - `io.js` — ブラウザ版の共通入出力ライブラリ（`Node/io.js` と対）
+  - `runner.js` / `runner.css` — 実行エンジンとスタイル（2ページで共用）
+  - `index.html` — 入口
+- `tools/aligncomments.js` — `Node/` のコメント位置を揃える（`node tools/aligncomments.js`）
+
+## プログラムの書き方（全45本で統一）
+
+```js
+// ====== 共通の入出力機能（変更しない）======
+require("./io.js");
+// ==========================================
+
+async function main() {
+    const d = parseInt(await input("Input search number: "), 10);
+    output("...");
+}
+
+main().finally(close);
+```
+
+- 共通ブロック3行と末尾行は**全45ファイル完全に同一**（入力を使わないファイルも例外なく）
+- `output(s)` — cout 相当の改行なし出力。**`print` ではない**（p5.js がグローバルの `print` を
+  自分のもので上書きしてしまうため。`output` は p5 とも `window` とも衝突しない）
+- `input(msg)` — cin 相当。Promise を返すので **必ず `await input(...)`**、`main()` は `async`
+  （ブラウザではキーボード入力を同期で待てないため、両環境とも async に統一）
+- `close()` — 標準入力を閉じる。呼ばないと対話実行時にプロセスが終わらない
+- `clock()` / `CLOCKS_PER_SEC` — BigSort2 の時間計測用。`io.js` が提供する
+- `isNode` は使わない（環境差は `io.js` が吸収する）
 
 ## 移植の約束事
 
 - 関数名・変数名・アルゴリズム・出力形式・コメントは C++ 版を維持する
 - C++ の整数除算は `Math.floor()` で再現
 - クラス・`new Array()` は使わない（配列リテラル `[]` を使用。JSの配列は自動拡張されるため）
-- 入出力は各ファイル冒頭の共通ブロック「`// ====== 共通の入出力機能（変更しない）======`」を使う
-  - `print(s)` — cout 相当の改行なし出力（Node: `process.stdout.write` ／ ブラウザ: `#output` 要素に追記）
-  - `input(msg)` — cin 相当の同期入力（Node: `fs.readSync(0)` で1行読み・`await` 不要 ／ ブラウザ: `window.prompt`）
-  - 全45ファイル完全に同一のブロック。変更する場合は `tools/transform.js` を修正して全ファイル一括で
-- 時間計測（BigSort2）の `clock()` はマイクロ秒を返す両対応
-  （Node: `process.hrtime.bigint()` 換算 ／ ブラウザ: `performance.now()` 換算。`CLOCKS_PER_SEC = 1000000`）
 - スレッド（SleepSort1 / QuickSort1P / QuickSort11P）は setTimeout / async + Promise.all で再現
-  - この2ファイルの `await` は並行実行の再現用で、入力とは無関係（残してよい）
+- コメント位置の規則（`tools/aligncomments.js` が適用。詳細はファイル冒頭に記載）
+  - 行末コメントは空行で区切られたブロックごとに同じ桁へ。突出して長い行（2番目より8桁以上長い）は基準から外す
+  - コメントアウトされた初期配列（`const s` / `const N`）は行頭1桁目から
+  - タブは半角4スペースに展開（スライド表示でタブ幅がぶれるため）
 
 ## 実行方法
 
-- `node Javascript/<ファイル名>.js` — 対話入力・パイプ入力（`echo "5" | node ...`）両方可
-- `node Node/<ファイル名>.js` — 上と同じだが Node.js専用版（ブラウザ分岐なし）
-- ブラウザ: `Javascript/html/index.html` をダブルクリック → 一覧から選んで実行（サーバー不要）
+- **Node**: `node Node/<ファイル名>.js` — 対話入力・パイプ入力（`echo "5" | node ...`）両方可
+- **ブラウザ**: `Web/index.html` をダブルクリック → HTML版 / p5.js版 を選ぶ（サーバー不要）
+  - `Node/` のソースを**まるごと**コード欄に貼れば動く。`require` 行と末尾の `main()` 呼び出しは
+    実行環境が自動で取り除く
+  - 実行 = Ctrl/Cmd + Enter、中止 = Esc。書いたコードは `localStorage` に自動保存
+  - キャンバスは既定で非表示。`createCanvas()` が呼ばれると自動で開く（実行1回につき1度だけ）
+  - p5.js の URL とアクセント色は「設定」から変更可（オフライン用にローカルパスも指定できる）
 
 ---
-
 ## 作業引き継ぎログ
+
+### 2026-08-19
+
+**やったこと（構成を大きく変えたセッション）:**
+
+1. **コメント位置の整形規則を確立**（`tools/aligncomments.js`）
+   - 行末コメントは空行区切りのブロックごとに揃える。突出して長い行は基準から外してはみ出させる
+   - コメントアウトされた初期配列は行頭から。タブは半角4スペースに展開
+   - 規則は3回作り直して現在の形に落ち着いた（全体53桁固定 → 連続行ごと → ブロックごと＋外れ値除外）
+2. **両対応版（`Javascript/`）を廃止し、`Node/` を標準に**
+   - 動機: `Javascript/` は同期 `input()`、`Node/` は `await input()` で**アルゴリズム本体が違っていた**。
+     目標1（本質部分の統一）を満たすには async に寄せる必要があった
+   - 共通ブロック45行 → `require("./io.js");` の1行に。`isNode` は全廃
+   - `print` → `output` に改名（p5.js がグローバルの `print` を奪うため。実測で確認済み）
+   - 検証: 移行前後で45本を実行し39本が出力完全一致、不一致ゼロ（残る6本は乱数使用で旧版どうしでも不一致）
+3. **`Web/` にブラウザ実行環境を新設**（HTML版・p5.js版の2つ、共通ライブラリ方式）
+   - sandbox付き iframe で実行し、実行のたびに作り直すので状態が残らない
+   - 中止ボタン（Esc）、キャンバスの自動開閉、日本語エラー要約、設定画面、コード自動保存
+4. `Javascript/` と不要になったツール（`build-node.js` `genhtml.js` `genplayground.js` `transform*.js` ほか）を削除
+
+**技術的に確定したこと（再調査不要）:**
+
+- **p5.js はグローバルの `print` を上書きする**が、`output` には触らない（実測済み）。改名で根本解決した
+- **無限ループは中止ボタンでも止められない** — 暴走中のJSはブラウザからも中断できず、iframe を
+  外して付け直しても復帰しない。実行環境は `ready` 応答の有無で検知し、ページ再読み込みを案内する
+  （コードは自動保存されているので失われない）
+- **アプリ内ブラウザは動的に作った `sandbox` 付き iframe のスクリプトを実行しない**（`cloneNode` も同様）。
+  そのため iframe は元の要素を使い回している。Safari/Chrome では制約がない可能性が高く、未確認
+- ブラウザペインが非表示だと `requestAnimationFrame` が止まるため、p5 の `draw()` は動かない。
+  スクリーンショットを撮ると動き出す（自動検証時の注意）
+
+**次回への注意:**
+
+- この環境の Node は `/opt/homebrew/bin/node`（v26.5.1）。**セッション開始時の `which node` では
+  見つからないことがある**が、`command -v node` なら見つかり実行もできる
+- `tools/aligncomments.js` は node で実行して検証済み（以前のセッションで作った Python 代替は不要になった）
+- **お手元での未確認事項**: Safari/Chrome で `Web/index.html` をダブルクリックしたときの動作
+  （特に無限ループからの復帰と、`file://` での iframe の挙動）
+- p5.js は CDN の `p5@2`（2.3.2）が既定。オフラインで使うなら `Web/lib/` に置いて設定画面でパスを変更する
+- `C++/` は参考用として触らない方針
+
 
 ### 2026-08-08
 
