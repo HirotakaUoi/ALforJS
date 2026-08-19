@@ -1,4 +1,4 @@
-// Javascript/ の全ソースについて、コメントの位置を揃える
+// Node/ の全ソースについて、コメントの位置を揃える
 //
 // 規則:
 //   1. 共通の入出力機能ブロック（先頭〜「// ====…=」だけの行）は対象外。それより後ろだけを整形する
@@ -19,7 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.join(__dirname, '..', 'Javascript');
+const ROOT = path.join(__dirname, '..', 'Node');
 const TABSTOP = 4;     // タブを何桁に展開するか
 const MINGAP = 2;      // コードとコメントの間の最小の空き
 const OUTLIER = 8;     // これ以上ほかより長い行は「突出して長い」とみなし、揃える基準から外す
@@ -135,12 +135,13 @@ function alignFile(file) {
     fs.writeFileSync(file, lines.join('\n'));
 }
 
+// io.js は共通ブロックを持たないので対象外
 const files = [];
 for (const f of fs.readdirSync(ROOT).sort()) {
-    if (f.endsWith('.js')) files.push(path.join(ROOT, f));
+    if (f.endsWith('.js') && f !== 'io.js') files.push(path.join(ROOT, f));
 }
 for (const f of fs.readdirSync(path.join(ROOT, '文字列アルゴリズム')).sort()) {
-    if (f.endsWith('.js')) files.push(path.join(ROOT, '文字列アルゴリズム', f));
+    if (f.endsWith('.js') && f !== 'io.js') files.push(path.join(ROOT, '文字列アルゴリズム', f));
 }
 for (const f of files) alignFile(f);
 console.log('整形: ' + files.length + ' ファイル');
