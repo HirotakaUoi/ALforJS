@@ -73,6 +73,6 @@ function main() {
     sleepkSort(s, N);
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ
 
 // node SleepSort1.js

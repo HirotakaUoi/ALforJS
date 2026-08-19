@@ -51,19 +51,19 @@ function input(msg) {
 // ==========================================
 
 function fact(n) {
-	let f = 1;
-	while (n >= 1) {
-		f = n * f;
-		n--;
-	}
-	return f;
+    let f = 1;
+    while (n >= 1) {
+        f = n * f;
+        n--;
+    }
+    return f;
 }
 
 
 function main() {
-	const n = parseInt(input("Input number: "), 10);
+    const n = parseInt(input("Input number: "), 10);
 
-	print(fact(n) + "\n");
+    print(fact(n) + "\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

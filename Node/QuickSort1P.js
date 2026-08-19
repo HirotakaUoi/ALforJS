@@ -1,19 +1,5 @@
-// ====== 共通の入出力機能（Node.js専用・readline使用）======
-// print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
-const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, terminal: false });
-const _lines = rl[Symbol.asyncIterator]();
-
-function print(s) {
-    process.stdout.write(String(s));
-}
-
-async function input(msg) {
-    print(msg);
-    const { value } = await _lines.next();
-    return (value ?? '').trim();
-}
+// ====== 共通の入出力機能（変更しない）======
+require("./io.js");
 // ==========================================
 
 // 配列の分割
@@ -37,12 +23,12 @@ function partition(arr, first, last) {
     // 分割結果を表示（ピボットを一度だけ表示）
     for (let k = first; k <= last; ++k) {
         if (k === pivotIndex) {
-            print("Pivot=" + pivot + " ");
+            output("Pivot=" + pivot + " ");
         } else {
-            print(arr[k] + " ");
+            output(arr[k] + " ");
         }
     }
-    print("\n");
+    output("\n");
 
     return pivotIndex;
 }
@@ -76,10 +62,10 @@ async function main() {
 
     await parallelQuickSort(arr, 0, n - 1);
 
-    print("Final sorted array: ");
+    output("Final sorted array: ");
     for (let i = 0; i < n; ++i)
-        print(arr[i] + " ");
-    print("\n");
+        output(arr[i] + " ");
+    output("\n");
 }
 
-main().finally(() => rl.close());
+main().finally(close);

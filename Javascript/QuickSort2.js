@@ -81,7 +81,7 @@ function qsort(s, first, last) {
             s[last] = temp;
         }
         pivot = s[last];
-        //			print("Pivot=" + pivot + "\n");
+        //          print("Pivot=" + pivot + "\n");
         i = first;
         j = last - 1;
         while (true) {
@@ -91,7 +91,7 @@ function qsort(s, first, last) {
             while ((j >= first) && (s[j] > pivot)) {
                 j -= 1;
             }
-            //			print("i= " + i + "j= " + j + "\n");
+            //          print("i= " + i + "j= " + j + "\n");
             if (i >= j) {
                 break;
             }
@@ -122,12 +122,12 @@ function qsort(s, first, last) {
 function quickSort(s, N) { qsort(s, 0, N - 1); }
 
 function main() {
-    // const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];
-    //		const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2,
-    // 100,-100,2];
-    // const N = 13;
+// const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2,
+// 100,-100,2];
+// const N = 13;
     const arraySize = parseInt(input("Input array size: "), 10);
-    const s = [];	// JSの配列は自動拡張されるため大きさの指定は不要
+    const s = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     const N = arraySize;
     for (let i = 0; i < N; i++) {
         // s[i] = (rand() % 10000000);
@@ -146,4 +146,4 @@ function main() {
     print("\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

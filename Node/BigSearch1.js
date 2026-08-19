@@ -1,19 +1,5 @@
-// ====== 共通の入出力機能（Node.js専用・readline使用）======
-// print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
-const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, terminal: false });
-const _lines = rl[Symbol.asyncIterator]();
-
-function print(s) {
-    process.stdout.write(String(s));
-}
-
-async function input(msg) {
-    print(msg);
-    const { value } = await _lines.next();
-    return (value ?? '').trim();
-}
+// ====== 共通の入出力機能（変更しない）======
+require("./io.js");
 // ==========================================
 
 function rand() {
@@ -23,14 +9,14 @@ function rand() {
 function qsort(s, first, last) {
   let pivot, i, j, temp;
 
-  //		for (let k=first; k<=last; k++) {
-  //			print(s[k] + " ");
-  //		}
-  //		print("first= " + first + " last= " + last + "\n");
+  //        for (let k=first; k<=last; k++) {
+  //            output(s[k] + " ");
+  //        }
+  //        output("first= " + first + " last= " + last + "\n");
 
   if (first < last) {
     pivot = s[last];
-    //			print("Pivot=" + pivot + "\n");
+    //          output("Pivot=" + pivot + "\n");
     i = first;
     j = last - 1;
     while (true) {
@@ -40,7 +26,7 @@ function qsort(s, first, last) {
       while (j >= first && s[j] > pivot) {
         j -= 1;
       }
-      //			print("i= " + i + "j= " + j + "\n");
+      //            output("i= " + i + "j= " + j + "\n");
       if (i >= j) {
         break;
       }
@@ -55,13 +41,13 @@ function qsort(s, first, last) {
     s[last] = temp;
 
     for (let k = first; k < i; k++) {
-      print(s[k] + " ");
+      output(s[k] + " ");
     }
-    print(" Pivot=" + s[i] + " ");
+    output(" Pivot=" + s[i] + " ");
     for (let k = i + 1; k <= last; k++) {
-      print(s[k] + " ");
+      output(s[k] + " ");
     }
-    print("\n");
+    output("\n");
 
     qsort(s, first, i - 1);
     qsort(s, i + 1, last);
@@ -75,11 +61,11 @@ function quickSort(s, N) {
 function search1(s, N, d) {
   for (let i = 0; i < N; i++) {
     if (d === s[i]) {
-      print("Found: " + d + " at index " + i + "\n");
+      output("Found: " + d + " at index " + i + "\n");
       return 0;
     }
   }
-  print("I can't find: " + d + "\n");
+  output("I can't find: " + d + "\n");
   return 0;
 }
 
@@ -89,35 +75,35 @@ function bsearch1(s, N, d) {
   last = N - 1;
   while (first <= last) {
     // 探索範囲が空でない間
-    center = Math.floor((first + last) / 2); // 範囲の真ん中を計算
+    center = Math.floor((first + last) / 2);  // 範囲の真ん中を計算
     if (d === s[center]) {
       // 範囲の真ん中の値がｄと等しい
-      print("Found: " + d + " at index " + center + "\n");
+      output("Found: " + d + " at index " + center + "\n");
       return 0;
     } else if (d < s[center]) {
       // 範囲の真ん中の値がｄより大きい
-      last = center - 1; // 範囲の後半分を省く
+      last = center - 1;    // 範囲の後半分を省く
     } else {
       // 範囲の真ん中の値がｄより小さい
-      first = center + 1; // 範囲の前半分を省く
+      first = center + 1;   // 範囲の前半分を省く
     }
   }
-  print("I can't find: " + d + "\n");
+  output("I can't find: " + d + "\n");
   return 0;
 }
 
 async function main() {
   const arraySize = parseInt(await input("Input array size: "), 10);
-  const s = []; // JSの配列は自動拡張されるため大きさの指定は不要
+  const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
   const N = arraySize;
   for (let i = 0; i < N; i++) {
     s[i] = rand() % 100000;
   }
   quickSort(s, N);
   for (let k = 0; k < N - 1; k++) {
-    print(s[k] + " ");
+    output(s[k] + " ");
   }
-  print("\n");
+  output("\n");
 
   const d = parseInt(await input("Input search number: "), 10);
 
@@ -125,4 +111,4 @@ async function main() {
   bsearch1(s, N, d);
 }
 
-main().finally(() => rl.close());
+main().finally(close);

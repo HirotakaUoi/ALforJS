@@ -3,141 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <title>BSearch1 プレイグラウンド</title>
-<style>
-  :root {
-    color-scheme: light dark;
-    --bg: #f5f5f7;
-    --panel-bg: #ffffff;
-    --text: #1d1d1f;
-    --muted: #6e6e73;
-    --border: #d2d2d7;
-    --accent: #0071e3;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1c1c1e;
-      --panel-bg: #2c2c2e;
-      --text: #f5f5f7;
-      --muted: #a1a1a6;
-      --border: #48484a;
-      --accent: #409cff;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    padding: 24px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
-  }
-  h1 {
-    font-size: 20px;
-    margin: 0 0 4px;
-  }
-  p.note {
-    color: var(--muted);
-    font-size: 13px;
-    margin: 0 0 20px;
-  }
-  .panes {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-  section {
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    flex: 1 1 420px;
-    min-width: 320px;
-  }
-  section h2 {
-    font-size: 14px;
-    margin: 0 0 10px;
-    color: var(--muted);
-    font-weight: 600;
-  }
-  #source {
-    box-sizing: border-box;
-    margin: 0;
-    width: 100%;
-    height: 420px;
-    resize: vertical;
-    white-space: pre;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px;
-  }
-  #terminal {
-    background: #000;
-    color: #d4d4d4;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    padding: 12px;
-    border-radius: 6px;
-    height: 320px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .term-input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #7CFC00;
-    font-family: inherit;
-    font-size: inherit;
-    caret-color: #7CFC00;
-    width: 12ch;
-  }
-  .controls {
-    margin-top: 12px;
-    display: flex;
-    gap: 8px;
-  }
-  button {
-    font-family: inherit;
-    font-size: 13px;
-    padding: 6px 16px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-  }
-  button:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-  button.secondary {
-    background: transparent;
-    color: var(--text);
-  }
-</style>
+<link rel="stylesheet" href="common/playground.css">
 </head>
 <body>
 
-<h1>アルゴリズム プレイグラウンド</h1>
-<p class="note">「実行」を押す（またはEnter）と開始。<code>input()</code>で止まったらターミナル内に入力欄が現れるので、値を打ってEnterで続きが実行されます。</p>
+<p class="note"><a href="index.html">&larr; 一覧に戻る</a></p>
+<h1>BSearch1</h1>
+<p class="note">
+「実行」を押す（またはEnter）と開始。<code>input()</code>で止まったらターミナル内に入力欄が現れるので、
+値を打ってEnterで続きが実行されます。</p>
 
 <div class="panes">
   <section class="code-pane">
     <h2>ソースコード</h2>
     <p class="note" style="margin-bottom: 10px;">
-      <code>print()</code> / <code>input()</code> は環境が提供する入出力（C++の cout / cin に相当）です。編集して「実行」を押すと、その内容で動きます。<br>
-      <code>main</code>は次の3種類のいずれかに対応：<code>function main()</code>（入力なし）／
-      <code>function* main()</code>（<code>yield* input(msg)</code>で入力待ち）／
-      <code>async function main()</code>（並列スレッド模擬など、<code>input()</code>を使わないもの）。<br>
-      <code>main</code>以外の関数（<code>partition</code>など）を使うプログラムは、それらもまとめてこの欄に書いてください。
+      <code>print()</code> / <code>input()</code> は環境が提供する入出力（C++の cout / cin に相当）です。
+      編集して「実行」を押すと、その内容で動きます。<br>
+      このプログラムは入力があるので <code>function* main()</code> ＋ <code>yield* input(msg)</code> の形になっています
+      （途中で止まって入力を待つため）。
     </p>
     <textarea id="source" spellcheck="false"></textarea>
   </section>
@@ -151,24 +34,7 @@
   </section>
 </div>
 
-<script>
-// ====== 共通の入出力機能（ターミナル・Generator版）======
-// print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当。yield で一時停止し、ターミナルの入力欄からの値を待つ
-//             （呼び出し側は yield* input(msg) の形で main() から呼ぶ）
-const term = document.getElementById('terminal');
-
-function print(s) {
-    term.appendChild(document.createTextNode(String(s)));
-    term.scrollTop = term.scrollHeight;
-}
-
-function* input(msg) {
-    const line = yield msg;
-    return line.trim();
-}
-// ==========================================
-
+<script id="source-text" type="text/plain">
 function* main() {
     let d, i, first, last, center;
     const s = [0, 1, 2, 4, 5, 7, 8, 9];
@@ -176,161 +42,22 @@ function* main() {
     d = parseInt(yield* input("Input search number: "), 10);
     first = 0;
     last = N - 1;
-    while (first <= last) { 				 // 探索範囲が空でない間
+    while (first <= last) {             // 探索範囲が空でない間
         print("First = " + first + ",Last = " + last + "\n");
         center = Math.floor((first + last) / 2);  // 範囲の真ん中を計算
-        if (d === s[center]) {  				// 範囲の真ん中の値がｄと等しい
+        if (d === s[center]) {          // 範囲の真ん中の値がｄと等しい
             print("Found: " + d + " at index " + center + "\n");
             return;
-        } else if (d < s[center]) {  		// 範囲の真ん中の値がｄより大きい
-            last = center - 1;       		// 範囲の後半分を省く
-        } else {  							// 範囲の真ん中の値がｄより小さい
-            first = center + 1;  			 // 範囲の前半分を省く
+        } else if (d < s[center]) {     // 範囲の真ん中の値がｄより大きい
+            last = center - 1;          // 範囲の後半分を省く
+        } else {                        // 範囲の真ん中の値がｄより小さい
+            first = center + 1;         // 範囲の前半分を省く
         }
     }
     print("I can't find: " + d + "\n");
 }
-
-// ====== ここから下は実行用の駆動部（アルゴリズム本体ではない）======
-const runBtn = document.getElementById('runBtn');
-const resetBtn = document.getElementById('resetBtn');
-let gen = null;
-let waitingForInput = false;
-
-// SleepSort1のような「setTimeoutを仕掛けたらすぐreturnする」プログラム対策：
-// 実行(run)/リセットのたびに世代を進め、古い世代のタイマーが後から発火しても無視する
-// （でないと、タイマーが残っている間に再実行すると出力が新旧混ざってしまう）
-let runGeneration = 0;
-// function宣言だと window.setTimeout 自体を上書きしてしまう（無限再帰の原因になる）ため、
-// window.setTimeout には影響しない const の関数式にする。それでもeval後のコードからの
-// 素の setTimeout(...) 呼び出しはこのローカル束縛を参照する（レキシカルスコープで解決されるため）
-const setTimeout = (fn, delay, ...args) => {
-    const scheduledGeneration = runGeneration;
-    return window.setTimeout(() => {
-        if (scheduledGeneration === runGeneration) fn(...args);
-    }, delay, ...args);
-};
-
-function showInputLine(promptText, onSubmit) {
-    print(promptText);
-    const box = document.createElement('input');
-    box.type = 'text';
-    box.className = 'term-input';
-    box.autocomplete = 'off';
-    box.spellcheck = false;
-    term.appendChild(box);
-    box.focus();
-    waitingForInput = true;
-    box.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter') return;
-        e.stopPropagation();  // documentのEnterハンドラ（実行開始用）まで伝播させない
-        const val = box.value;
-        box.remove();
-        waitingForInput = false;
-        print(val + '\n');
-        onSubmit(val);
-    });
-    term.scrollTop = term.scrollHeight;
-}
-
-function finishOk() {
-    runBtn.disabled = false;
-    resetBtn.disabled = true;
-}
-
-function finishWithError(label, message) {
-    print('\n' + label + ': ' + message + '\n');
-    finishOk();
-}
-
-// gen.next()の呼び出しはここに集約し、実行中の例外（編集した本体のバグ）を毎回捕まえる
-function advance(val) {
-    let res;
-    try {
-        res = gen.next(val);
-    } catch (e) {
-        finishWithError('実行時エラー', e.message);
-        return;
-    }
-    step(res);
-}
-
-function step(res) {
-    if (res.done) {
-        finishOk();
-        return;
-    }
-    showInputLine(res.value, (val) => advance(val));
-}
-
-// main() の種類ごとに駆動方法を変える：
-// - function*  : input()で一時停止できるもの（gen.next()を刻んで進める）
-// - async function : QuickSort1P/11P のような Promise.all を使う並列スレッド模擬（input()は呼ばない前提）
-// - function（通常）: 入力なしでその場で完結するもの（SleepSort1のsetTimeoutもここに含む）
-function kindOf(fn) {
-    const name = fn.constructor.name;
-    if (name === 'GeneratorFunction') return 'generator';
-    if (name === 'AsyncFunction') return 'async';
-    if (name === 'Function') return 'sync';
-    return null;
-}
-
-function run() {
-    try {
-        eval(document.getElementById('source').value);  // main（と、それが使う関数群）を編集後の内容で再定義する
-    } catch (e) {
-        term.textContent = '構文エラー: ' + e.message + '\n';
-        return;
-    }
-    const kind = typeof main === 'function' ? kindOf(main) : null;
-    if (!kind) {
-        term.textContent = 'main は function main() / async function main() / function* main() のいずれかにしてください\n';
-        return;
-    }
-
-    runBtn.disabled = true;
-    resetBtn.disabled = false;
-    term.textContent = '';
-    runGeneration++;  // 前回の実行で残っていたsetTimeoutを無効化する
-
-    if (kind === 'generator') {
-        gen = main();
-        advance();
-    } else if (kind === 'async') {
-        main().then(finishOk, (e) => finishWithError('実行時エラー', e.message));
-    } else {
-        try {
-            main();
-            finishOk();
-        } catch (e) {
-            finishWithError('実行時エラー', e.message);
-        }
-    }
-}
-
-function reset() {
-    runBtn.disabled = false;
-    resetBtn.disabled = true;
-    term.textContent = '';
-    gen = null;
-    runGeneration++;  // 残っていたsetTimeoutを無効化する
-}
-
-runBtn.addEventListener('click', run);
-resetBtn.addEventListener('click', reset);
-
-document.addEventListener('keydown', (e) => {
-    // runBtn自体（ネイティブなEnter動作と二重発火するため）と
-    // ソース編集欄（改行入力とかぶるため）ではEnter即実行を無効にする
-    if (e.key === 'Enter' && !waitingForInput && !runBtn.disabled &&
-        e.target !== runBtn && e.target.id !== 'source') {
-        run();
-    }
-});
-
-// ソースコード欄には main() のみ表示する（print/input は環境が提供するライブラリとして隠す）
-document.getElementById('source').value = main.toString();
 </script>
+<script src="common/runner.js"></script>
 
 </body>
 </html>

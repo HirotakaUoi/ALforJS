@@ -51,20 +51,20 @@ function input(msg) {
 // ==========================================
 
 function f(n) {
-	// print("F=" + n + "\n");
-	if (n === 0) {
-		return 0;
-	} else if (n === 1) {
-		return 1;
-	} else {
-		return f(n - 1) + f(n - 2);
-	}
+    // print("F=" + n + "\n");
+    if (n === 0) {
+        return 0;
+    } else if (n === 1) {
+        return 1;
+    } else {
+        return f(n - 1) + f(n - 2);
+    }
 }
 
 function main() {
-	const n = parseInt(input("Input number: "), 10);
+    const n = parseInt(input("Input number: "), 10);
 
-	print(f(n) + "\n");
+    print(f(n) + "\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

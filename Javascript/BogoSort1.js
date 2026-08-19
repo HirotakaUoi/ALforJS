@@ -87,14 +87,14 @@ function bogoSort(s, N) {
 function main() {
     const s = [4, 5, 2];
     const N = 3;
-    // const s = [4, 5, 2, 9, 3];
-    // const N = 5;
-    // const s = [4, 5, 2, 7, 1, 9, 3];
-    // const N = 7;
-    // const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
-    // const N = 9;
-    // const s = [4, 5, 8, 2, 7, 1, 9, 0, 3, 10];
-    // const N = 13;
+// const s = [4, 5, 2, 9, 3];
+// const N = 5;
+// const s = [4, 5, 2, 7, 1, 9, 3];
+// const N = 7;
+// const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
+// const N = 9;
+// const s = [4, 5, 8, 2, 7, 1, 9, 0, 3, 10];
+// const N = 13;
 
     bogoSort(s, N);
     for (let k = 0; k < N; k++) {
@@ -103,6 +103,6 @@ function main() {
     print("\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
-//	const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
-//	const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];

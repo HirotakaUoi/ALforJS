@@ -51,75 +51,75 @@ function input(msg) {
 // ==========================================
 
 function qsort(s, first, last) {
-	let pivot, i, j, temp;
+    let pivot, i, j, temp;
 
-		// for (let k=first; k<=last; k++) {
-		// 	print(s[k] + " ");
-		// }
-		// print("first= " + first + " last= " + last + "\n");
+        // for (let k=first; k<=last; k++) {
+        //  print(s[k] + " ");
+        // }
+        // print("first= " + first + " last= " + last + "\n");
 
-	if (first < last) {
-		pivot = s[last];
-		// print("Pivot=" + pivot + "\n");
-		i = first;
-		j = last - 1;
-		while (true) {
-			while ((i < last) && (s[i] < pivot)) {
-				i += 1;
-			}
-			while ((j >= first) && (s[j] > pivot)) {
-				j -= 1;
-			}
-//			print("i= " + i + "j= " + j + "\n");
-			if (i >= j) {
-				break;
-			}
-			temp = s[i];
-			s[i] = s[j];
-			s[j] = temp;
-			i += 1;
-			j -= 1;
-		}
-		temp = s[i];
-		s[i] = s[last];
-		s[last] = temp;
+    if (first < last) {
+        pivot = s[last];
+        // print("Pivot=" + pivot + "\n");
+        i = first;
+        j = last - 1;
+        while (true) {
+            while ((i < last) && (s[i] < pivot)) {
+                i += 1;
+            }
+            while ((j >= first) && (s[j] > pivot)) {
+                j -= 1;
+            }
+//          print("i= " + i + "j= " + j + "\n");
+            if (i >= j) {
+                break;
+            }
+            temp = s[i];
+            s[i] = s[j];
+            s[j] = temp;
+            i += 1;
+            j -= 1;
+        }
+        temp = s[i];
+        s[i] = s[last];
+        s[last] = temp;
 
-	for (let k = first; k < i; k++) {
-		print(s[k] + " ");
-	}
-	print(" Pivot=" + s[i] + " ");
-	for (let k = i + 1; k <= last; k++) {
-		print(s[k] + " ");
-	}
-	print("\n");
+    for (let k = first; k < i; k++) {
+        print(s[k] + " ");
+    }
+    print(" Pivot=" + s[i] + " ");
+    for (let k = i + 1; k <= last; k++) {
+        print(s[k] + " ");
+    }
+    print("\n");
 
-		qsort(s, first, i - 1);
-		qsort(s, i + 1, last);
-	}
+        qsort(s, first, i - 1);
+        qsort(s, i + 1, last);
+    }
 }
 
 function quickSort(s, N) {
-	qsort(s, 0, N - 1);
+    qsort(s, 0, N - 1);
 }
 
 
 function main() {
-		// const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];
-		// const s = [-10,-4, 9, 3, 0, 12, 0, 2, 100, -100, -2];
-		// const N = 11;
-		// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
-	const s = [4, 5, 2, 11, 6, 10, 1, 9, 3, 0, -1, -2, 12];
-	const N = 13;
-	for (let k = 0; k < N; k++) {
-		print(s[k] + " ");
-	}
-	print("\n");
+// const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];
+// const s = [-10,-4, 9, 3, 0, 12, 0, 2, 100, -100, -2];
+// const N = 11;
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
+    const s = [4, 5, 2, 11, 6, 10, 1, 9, 3, 0, -1, -2, 12];
+    const N = 13;
+    for (let k = 0; k < N; k++) {
+        print(s[k] + " ");
+    }
+    print("\n");
 
-	quickSort(s, N);
-	for (let k = 0; k < N; k++) {
-		print(s[k] + " ");
-	}
-	print("\n");
+    quickSort(s, N);
+    for (let k = 0; k < N; k++) {
+        print(s[k] + " ");
+    }
+    print("\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

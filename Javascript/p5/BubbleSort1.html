@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>BubbleSort1（p5.js版）</title>
+<style>
+    body   { font-family: sans-serif; margin: 2em; }
+    pre    { background: #f4f4f4; padding: 1em; border-radius: 6px; white-space: pre-wrap; min-height: 3em; }
+    a      { text-decoration: none; }
+    button { font-size: 1em; padding: 0.4em 1.2em; margin-right: 0.4em; }
+    #canvas { margin: 0.5em 0; }
+    canvas { border: 1px solid #ddd; border-radius: 6px; }
+    .controls { margin: 0.8em 0; }
+    .note  { color: #666; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<p><a href="index.html">&larr; p5.js版の一覧に戻る</a>　<a href="../html/BubbleSort1.html">テキスト版はこちら</a></p>
+<h1>BubbleSort1（p5.js版）</h1>
+<p class="note">
+オレンジ＝比較中、赤＝いま交換した、緑＝完了。<br>
+アルゴリズムは <code>Javascript/BubbleSort1.js</code> とまったく同じで、比較・交換の場所に記録用の1行を足しただけです。
+</p>
+
+<div id="canvas"></div>
+
+<div class="controls">
+<button id="btnRun">実行</button>
+<button id="btnPlay">再生</button>
+<button id="btnStep">1ステップ</button>
+<button id="btnHead">最初から</button>
+　速さ <input id="speed" type="range" min="1" max="200" value="12"> <span class="note">（1秒あたりの手数）</span>
+</div>
+
+<p class="note">下は元のプログラムの出力（cout 相当）です。アニメーションと同じ速さで出ます。</p>
+<pre id="output"></pre>
+
+<!-- p5.js 本体。オフラインで使いたい場合は p5.min.js を lib/ に置いて下の行に差し替える
+     <script src="lib/p5.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
+<script src="common/viz.js"></script>
+<script src="BubbleSort1.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>アルゴリズム実行環境</title>
+<link rel="stylesheet" href="runner.css">
+<style>
+  body { display: block; overflow: auto; padding: 40px 24px; height: auto; }
+  .wrap { max-width: 44em; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  p { line-height: 1.8; color: var(--muted); font-size: 13.5px; }
+  .choices { display: flex; gap: 16px; margin: 28px 0; flex-wrap: wrap; }
+  .choice { flex: 1 1 240px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: var(--text); display: block; }
+  .choice:hover { border-color: var(--accent); }
+  .choice h2 { margin: 0 0 6px; font-size: 15px; }
+  .choice p { margin: 0; font-size: 12.5px; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font: 12.5px var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>アルゴリズム実行環境</h1>
+<p><code>Node/</code> にあるプログラムのソースを、そのままコード欄に貼り付けて実行できます。
+共通の入出力（<code>output</code> / <code>input</code>）は実行環境が用意するので、
+<code>require("./io.js");</code> の行や末尾の <code>main().finally(close);</code> は貼ったままで構いません。</p>
+
+<div class="choices">
+  <a class="choice" href="html.html">
+    <h2>HTML版</h2>
+    <p>テキストの入出力だけ。外部ライブラリを読み込まないので、
+       ネットにつながっていなくても動きます。ソート・探索の45本はこちらで足ります。</p>
+  </a>
+  <a class="choice" href="p5.html">
+    <h2>p5.js版</h2>
+    <p>HTML版に描画キャンバスを足したもの。既定では隠れていて、
+       <code>createCanvas()</code> が呼ばれると自動で開きます。三角マークで手動でも開閉できます。</p>
+  </a>
+</div>
+
+<p>どちらも「実行」（Ctrl / Cmd + Enter）と「中止」（Esc）で操作します。
+書いたコードは自動で保存されるので、ページを閉じても残ります。
+p5.js の読み込み先やアクセント色は「設定」から変えられます。</p>
+
+</div>
+</body>
+</html>

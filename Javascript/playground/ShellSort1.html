@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ShellSort1 プレイグラウンド</title>
+<link rel="stylesheet" href="common/playground.css">
+</head>
+<body>
+
+<p class="note"><a href="index.html">&larr; 一覧に戻る</a></p>
+<h1>ShellSort1</h1>
+<p class="note">
+「実行」を押す（またはEnter）と開始。<code>input()</code>で止まったらターミナル内に入力欄が現れるので、
+値を打ってEnterで続きが実行されます。</p>
+
+<div class="panes">
+  <section class="code-pane">
+    <h2>ソースコード</h2>
+    <p class="note" style="margin-bottom: 10px;">
+      <code>print()</code> / <code>input()</code> は環境が提供する入出力（C++の cout / cin に相当）です。
+      編集して「実行」を押すと、その内容で動きます。
+    </p>
+    <textarea id="source" spellcheck="false"></textarea>
+  </section>
+  <section class="terminal-pane">
+    <h2>実行</h2>
+    <div id="terminal" tabindex="0"></div>
+    <div class="controls">
+      <button id="runBtn">実行</button>
+      <button id="resetBtn" class="secondary" disabled>リセット</button>
+    </div>
+  </section>
+</div>
+
+<script id="source-text" type="text/plain">
+function shellSort(s, N) {
+    let temp, i, j, h;
+
+    h = 1;
+    while (h < N)
+        h = 3 * h + 1;
+    h = Math.floor((h - 1) / 3);
+
+    while (h > 0) {
+        print(h + " : ");
+        for (let x = 0; x < N; x++) {
+            print(s[x] + " ");
+        }
+        print("\n");
+        for (i = h; i < N; i++) {
+            for (let x = 0; x < N; x++) {
+                print(s[x] + " ");
+            }
+            print("\n");
+            j = i;
+            while ((j >= h) && (s[j - h] > s[j])) {
+                temp = s[j];
+                s[j] = s[j - h];
+                s[j - h] = temp;
+                j -= h;
+            }
+        }
+        h = Math.floor((h - 1) / 3);
+    }
+}
+
+function main() {
+    const s = [8, 3, 4, 1, 7, 6, 9, 5, 0];
+    const N = 9;
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -2, -1, 6];
+// const N = 14;
+// const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
+// const N = 9;
+
+
+    shellSort(s, N);
+    for (let k = 0; k < N; k++) {
+        print(s[k] + " ");
+    }
+    print("\n");
+}
+
+
+
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
+</script>
+<script src="common/runner.js"></script>
+
+</body>
+</html>

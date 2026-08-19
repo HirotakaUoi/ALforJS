@@ -1,26 +1,12 @@
-// ====== 共通の入出力機能（Node.js専用・readline使用）======
-// print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
-const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, terminal: false });
-const _lines = rl[Symbol.asyncIterator]();
-
-function print(s) {
-    process.stdout.write(String(s));
-}
-
-async function input(msg) {
-    print(msg);
-    const { value } = await _lines.next();
-    return (value ?? '').trim();
-}
+// ====== 共通の入出力機能（変更しない）======
+require("./io.js");
 // ==========================================
 
 // ずらし表の作成
 function CreateTable(pattern, table) {
     const patternLength = pattern.length;
     for (let i = 0; i < 256; i++) {
-        table[i] = patternLength; // 初期化（デフォルトでパターンの長さに設定）
+        table[i] = patternLength;   // 初期化（デフォルトでパターンの長さに設定）
     }
     for (let i = 0; i < patternLength; i++) {
         table[pattern.charCodeAt(i)] = patternLength - i - 1;
@@ -29,7 +15,7 @@ function CreateTable(pattern, table) {
 
 // Boyer-Moore-Horspool法による文字列検索
 function BMHSearch(target, pattern) {
-    const table = [];	// JSの配列は自動拡張されるため大きさの指定は不要（CreateTableが256要素すべてを埋める）
+    const table = [];   // JSの配列は自動拡張されるため大きさの指定は不要（CreateTableが256要素すべてを埋める）
     CreateTable(pattern, table);
 
     // 開始位置をパターン末尾に合わせる
@@ -54,11 +40,11 @@ function BMHSearch(target, pattern) {
         // 不一致の場合、ずらし表を参照し i を進める
         // ただし、今比較した位置より後の位置とする
         const shift1 = table[pattern.charCodeAt(p)];
-        const shift2 = pattern.length - p; // 比較を開始した地点の1つ後ろの文字
+        const shift2 = pattern.length - p;  // 比較を開始した地点の1つ後ろの文字
         i += Math.max(shift1, shift2);
     }
 
-    return -1; // 見つからなかった
+    return -1;  // 見つからなかった
 }
 
 async function main() {
@@ -66,9 +52,9 @@ async function main() {
     const s = await input("Input string: ");
     const result = BMHSearch(s, p);
     if (result === -1)
-        print("Pattern not matched!\n");
+        output("Pattern not matched!\n");
     else
-        print("Pattern matched! at " + result + "\n");
+        output("Pattern matched! at " + result + "\n");
 }
 
-main().finally(() => rl.close());
+main().finally(close);

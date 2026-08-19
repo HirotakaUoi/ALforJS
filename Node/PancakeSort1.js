@@ -1,19 +1,5 @@
-// ====== 共通の入出力機能（Node.js専用・readline使用）======
-// print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
-const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, terminal: false });
-const _lines = rl[Symbol.asyncIterator]();
-
-function print(s) {
-    process.stdout.write(String(s));
-}
-
-async function input(msg) {
-    print(msg);
-    const { value } = await _lines.next();
-    return (value ?? '').trim();
-}
+// ====== 共通の入出力機能（変更しない）======
+require("./io.js");
 // ==========================================
 
 // リストの前からk+1個の要素を反転する関数
@@ -41,16 +27,16 @@ function pancakeSort(s, N) {
             // 最大要素を先頭に持ってくる
             flip(s, max_index);
             for (let k = 0; k < N; k++) {
-                print(s[k] + " ");
+                output(s[k] + " ");
             }
-            print("\n");
+            output("\n");
 
             // 最大要素を現在のサイズの最後に移動する
             flip(s, i - 1);
             for (let k = 0; k < N; k++) {
-                print(s[k] + " ");
+                output(s[k] + " ");
             }
-            print("\n");
+            output("\n");
         }
     }
 }
@@ -58,19 +44,19 @@ function pancakeSort(s, N) {
 async function main() {
     const s = [5, 4, 8, 2, 7, 0, 1];
     const N = 7;
-    // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,
-    // -100, 2]; const N = 19;
+// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,
+// -100, 2]; const N = 19;
 
     pancakeSort(s, N);
 
     // ソート後のリストを表示
     for (let k = 0; k < N; k++) {
-        print(s[k] + " ");
+        output(s[k] + " ");
     }
-    print("\n");
+    output("\n");
 
     const t = [0, 1, 2, 3, 4, 5, 6];
     for (let t = 0; t < 7; t++) return;
 }
 
-main().finally(() => rl.close());
+main().finally(close);

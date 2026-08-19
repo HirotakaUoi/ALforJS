@@ -52,18 +52,18 @@ function input(msg) {
 
 function main() {
     const s = [4, 5, 2, 8, 7, 1, 9, 0, 99999];  //配列の最後にとりあえず 99999 を置いておく
-    const N = 8;  // 99999は除いた大きさ
+    const N = 8;    // 99999は除いた大きさ
 
     const d = parseInt(input("Input search number: "), 10);
-    s[N] = d;         //配列の最後(99999の位置)にdを置く
+    s[N] = d;   //配列の最後(99999の位置)にdを置く
 
     let i = 0;
     while (s[i] !== d) i++;
-    if (i === N) {     //iが配列の最後を指していたら…
+    if (i === N) {  //iが配列の最後を指していたら…
         print("I can't find: " + d + "\n");
     } else {
         print("Found: " + d + " at index " + i + "\n");
     }
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

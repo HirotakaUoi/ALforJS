@@ -82,8 +82,8 @@ function radixSort(s, N, max) {
 function main() {
     const s = [345, 98, 302, 719, 804, 620, 183, 431, 572];
     const N = 9;
-    // const s = new Array(20);
-    // const N = 20;
+// const s = new Array(20);
+// const N = 20;
     // for (let i = 0; i < N; i++) {
     //     s[i] = (rand() % 1000);
     // }
@@ -98,4 +98,4 @@ function main() {
     print("\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

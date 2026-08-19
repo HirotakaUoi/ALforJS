@@ -54,7 +54,7 @@ function input(msg) {
 function CreateTable(pattern, table) {
     const patternLength = pattern.length;
     for (let i = 0; i < 256; i++) {
-        table[i] = patternLength; // 初期化（デフォルトでパターンの長さに設定）
+        table[i] = patternLength;   // 初期化（デフォルトでパターンの長さに設定）
     }
     for (let i = 0; i < patternLength; i++) {
         table[pattern.charCodeAt(i)] = patternLength - i - 1;
@@ -63,7 +63,7 @@ function CreateTable(pattern, table) {
 
 // Boyer-Moore-Horspool法による文字列検索
 function BMHSearch(target, pattern) {
-    const table = [];	// JSの配列は自動拡張されるため大きさの指定は不要（CreateTableが256要素すべてを埋める）
+    const table = [];   // JSの配列は自動拡張されるため大きさの指定は不要（CreateTableが256要素すべてを埋める）
     CreateTable(pattern, table);
 
     // 開始位置をパターン末尾に合わせる
@@ -88,11 +88,11 @@ function BMHSearch(target, pattern) {
         // 不一致の場合、ずらし表を参照し i を進める
         // ただし、今比較した位置より後の位置とする
         const shift1 = table[pattern.charCodeAt(p)];
-        const shift2 = pattern.length - p; // 比較を開始した地点の1つ後ろの文字
+        const shift2 = pattern.length - p;  // 比較を開始した地点の1つ後ろの文字
         i += Math.max(shift1, shift2);
     }
 
-    return -1; // 見つからなかった
+    return -1;  // 見つからなかった
 }
 
 function main() {
@@ -105,4 +105,4 @@ function main() {
         print("Pattern matched! at " + result + "\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

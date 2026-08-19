@@ -54,4 +54,4 @@ function main() {
     print("こんにちは！ 魚井!\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

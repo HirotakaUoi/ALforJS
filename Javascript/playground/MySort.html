@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>MySort プレイグラウンド</title>
+<link rel="stylesheet" href="common/playground.css">
+</head>
+<body>
+
+<p class="note"><a href="index.html">&larr; 一覧に戻る</a></p>
+<h1>MySort</h1>
+<p class="note">
+「実行」を押す（またはEnter）と開始。<code>input()</code>で止まったらターミナル内に入力欄が現れるので、
+値を打ってEnterで続きが実行されます。</p>
+
+<div class="panes">
+  <section class="code-pane">
+    <h2>ソースコード</h2>
+    <p class="note" style="margin-bottom: 10px;">
+      <code>print()</code> / <code>input()</code> は環境が提供する入出力（C++の cout / cin に相当）です。
+      編集して「実行」を押すと、その内容で動きます。
+    </p>
+    <textarea id="source" spellcheck="false"></textarea>
+  </section>
+  <section class="terminal-pane">
+    <h2>実行</h2>
+    <div id="terminal" tabindex="0"></div>
+    <div class="controls">
+      <button id="runBtn">実行</button>
+      <button id="resetBtn" class="secondary" disabled>リセット</button>
+    </div>
+  </section>
+</div>
+
+<script id="source-text" type="text/plain">
+function qsort(s, first, last, b) {
+    let i, j, k;
+
+//  print("Merge  " + first + " " + last + "    ");
+//  for (let q = first; q <= last; q++)
+//      print(s[q] + " ");
+//  print("\n");
+
+    if (first < last) {
+        const center = Math.floor((first + last) / 2);
+        qsort(s, first, center, b);
+        qsort(s, center + 1, last, b);
+
+        for (i = first; i <= center; i++)
+            b[i] = s[i];
+        for (i = center + 1; i <= last; i++)
+            b[last + center + 1 - i] = s[i];
+
+        i = first;
+        j = last;
+        for (k = first; k <= last; k++)
+            if (b[i] < b[j]) {
+                s[k] = b[i];
+                i++;
+            } else {
+                s[k] = b[j];
+                j--;
+            }
+    }
+}
+
+function mySort(s, N) {
+    const b = [];   // JSの配列は自動拡張されるため大きさの指定は不要
+    qsort(s, 0, N - 1, b);
+}
+
+function main() {
+    const s = [4, 6, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
+    const N = 13;
+
+    mySort(s, N);
+    for (let k = 0; k < N; k++) {
+        print(s[k] + " ");
+    }
+    print("\n");
+}
+</script>
+<script src="common/runner.js"></script>
+
+</body>
+</html>

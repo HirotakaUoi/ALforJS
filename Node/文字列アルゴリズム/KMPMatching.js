@@ -1,19 +1,5 @@
-// ====== 共通の入出力機能（Node.js専用・readline使用）======
-// print(s)  : C++の cout << 相当（改行なし出力）
-// input(msg): C++の cin >> 相当（readlineの非同期イテレータから1行受け取る。呼び出し側は await input(...)）
-const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, terminal: false });
-const _lines = rl[Symbol.asyncIterator]();
-
-function print(s) {
-    process.stdout.write(String(s));
-}
-
-async function input(msg) {
-    print(msg);
-    const { value } = await _lines.next();
-    return (value ?? '').trim();
-}
+// ====== 共通の入出力機能（変更しない）======
+require("./io.js");
 // ==========================================
 
 function makePartialMatchTable(pat) {
@@ -39,15 +25,15 @@ function KMP(p, s) {
     let i, j;
 
     const pmt = makePartialMatchTable(p);
-    for (let k = 0; k < p.length; k++) print(pmt[k] + " ");
-    print("\n");
-    print(p + "\n");
-    print(s + "\n");
+    for (let k = 0; k < p.length; k++) output(pmt[k] + " ");
+    output("\n");
+    output(p + "\n");
+    output(s + "\n");
 
     i = 0;
     j = 0;
     while (i + j < s.length) {
-        print("i=" + i + " i+j=" + (i + j) + " s[" + (i + j) + "]=" + s[i + j] + ", j=" + j + " p[" + j + "]=" + p[j] + " pmt[" + j + "]=" + pmt[j] + "\n");
+        output("i=" + i + " i+j=" + (i + j) + " s[" + (i + j) + "]=" + s[i + j] + ", j=" + j + " p[" + j + "]=" + p[j] + " pmt[" + j + "]=" + pmt[j] + "\n");
 
         if (s[i + j] === p[j]) {
             j++;
@@ -72,9 +58,9 @@ async function main() {
     s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
     const result = KMP(p, s);
     if (result === -1)
-        print("Pattern not matched!\n");
+        output("Pattern not matched!\n");
     else
-        print("Pattern matched! at " + result + "\n");
+        output("Pattern matched! at " + result + "\n");
 }
 
-main().finally(() => rl.close());
+main().finally(close);

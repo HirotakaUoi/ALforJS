@@ -62,14 +62,14 @@ function rand() {
 function qsort(s, first, last) {
   let pivot, i, j, temp;
 
-  //		for (let k=first; k<=last; k++) {
-  //			print(s[k] + " ");
-  //		}
-  //		print("first= " + first + " last= " + last + "\n");
+  //        for (let k=first; k<=last; k++) {
+  //            print(s[k] + " ");
+  //        }
+  //        print("first= " + first + " last= " + last + "\n");
 
   if (first < last) {
     pivot = s[last];
-    //			print("Pivot=" + pivot + "\n");
+    //          print("Pivot=" + pivot + "\n");
     i = first;
     j = last - 1;
     while (true) {
@@ -79,7 +79,7 @@ function qsort(s, first, last) {
       while (j >= first && s[j] > pivot) {
         j -= 1;
       }
-      //			print("i= " + i + "j= " + j + "\n");
+      //            print("i= " + i + "j= " + j + "\n");
       if (i >= j) {
         break;
       }
@@ -128,17 +128,17 @@ function bsearch1(s, N, d) {
   last = N - 1;
   while (first <= last) {
     // 探索範囲が空でない間
-    center = Math.floor((first + last) / 2); // 範囲の真ん中を計算
+    center = Math.floor((first + last) / 2);  // 範囲の真ん中を計算
     if (d === s[center]) {
       // 範囲の真ん中の値がｄと等しい
       print("Found: " + d + " at index " + center + "\n");
       return 0;
     } else if (d < s[center]) {
       // 範囲の真ん中の値がｄより大きい
-      last = center - 1; // 範囲の後半分を省く
+      last = center - 1;    // 範囲の後半分を省く
     } else {
       // 範囲の真ん中の値がｄより小さい
-      first = center + 1; // 範囲の前半分を省く
+      first = center + 1;   // 範囲の前半分を省く
     }
   }
   print("I can't find: " + d + "\n");
@@ -147,7 +147,7 @@ function bsearch1(s, N, d) {
 
 function main() {
   const arraySize = parseInt(input("Input array size: "), 10);
-  const s = []; // JSの配列は自動拡張されるため大きさの指定は不要
+  const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
   const N = arraySize;
   for (let i = 0; i < N; i++) {
     s[i] = rand() % 100000;
@@ -164,4 +164,4 @@ function main() {
   bsearch1(s, N, d);
 }
 
-if (isNode) main(); // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

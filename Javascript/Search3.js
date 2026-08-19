@@ -53,21 +53,21 @@ function input(msg) {
 function main() {
 
     const s = [0, 1, 2, 4, 5, 7, 8, 9];
-	const N = 8;
+    const N = 8;
     let i;
 
     const d = parseInt(input("Input search number: "), 10);
 
     for (i = 0; i < N; i++) {
-		if (d <= s[i])
-			break;
-	}
+        if (d <= s[i])
+            break;
+    }
 
-	if ((i < N) && (d === s[i])) {		// dが見つかったなら…
+    if ((i < N) && (d === s[i])) {  // dが見つかったなら…
         print("Found: " + d + " at index " + i + "\n");
     } else {
-		print("I can't find: " + d + "\n");
-	}
+        print("I can't find: " + d + "\n");
+    }
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

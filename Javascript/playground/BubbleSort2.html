@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>BubbleSort2 プレイグラウンド</title>
+<link rel="stylesheet" href="common/playground.css">
+</head>
+<body>
+
+<p class="note"><a href="index.html">&larr; 一覧に戻る</a></p>
+<h1>BubbleSort2</h1>
+<p class="note">
+「実行」を押す（またはEnter）と開始。<code>input()</code>で止まったらターミナル内に入力欄が現れるので、
+値を打ってEnterで続きが実行されます。</p>
+
+<div class="panes">
+  <section class="code-pane">
+    <h2>ソースコード</h2>
+    <p class="note" style="margin-bottom: 10px;">
+      <code>print()</code> / <code>input()</code> は環境が提供する入出力（C++の cout / cin に相当）です。
+      編集して「実行」を押すと、その内容で動きます。<br>
+      このプログラムは入力があるので <code>function* main()</code> ＋ <code>yield* input(msg)</code> の形になっています
+      （途中で止まって入力を待つため）。
+    </p>
+    <textarea id="source" spellcheck="false"></textarea>
+  </section>
+  <section class="terminal-pane">
+    <h2>実行</h2>
+    <div id="terminal" tabindex="0"></div>
+    <div class="controls">
+      <button id="runBtn">実行</button>
+      <button id="resetBtn" class="secondary" disabled>リセット</button>
+    </div>
+  </section>
+</div>
+
+<script id="source-text" type="text/plain">
+function rand() {
+  return Math.floor(Math.random() * 2147483648);
+}
+
+function bubbleSort(s, N) {
+  let temp;
+  for (let i = 0; i < N - 1; i++)
+    for (let j = 0; j < N - 1; j++)
+      if (s[j] > s[j + 1]) {
+        temp = s[j];
+        s[j] = s[j + 1];
+        s[j + 1] = temp;
+      }
+}
+
+function* main() {
+  const arraySize = parseInt(yield* input("Input array size: "), 10);
+  const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
+  const N = arraySize;
+  for (let i = 0; i < N; i++) {
+    s[i] = rand() % 10000;
+  }
+  for (let k = 0; k < N - 1; k++) {
+    print(s[k] + " ");
+  }
+  print("\n");
+
+  bubbleSort(s, N);
+  for (let k = 0; k < N; k++) {
+    print(s[k] + " ");
+  }
+  print("\n");
+}
+</script>
+<script src="common/runner.js"></script>
+
+</body>
+</html>

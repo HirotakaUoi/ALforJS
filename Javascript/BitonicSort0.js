@@ -59,9 +59,9 @@ function rand() {
 }
 
 function swap(s, i, j) {
-	const temp = s[i];
-	s[i] = s[j];
-	s[j] = temp;
+    const temp = s[i];
+    s[i] = s[j];
+    s[j] = temp;
 }
 
 function bitonicsort(lgn, ary) {
@@ -80,7 +80,7 @@ function bitonicsort(lgn, ary) {
 function main() {
     srand(10000);
     const lgn = 10;
-    const ary = [];	// JSの配列は自動拡張されるため大きさの指定は不要
+    const ary = [];     // JSの配列は自動拡張されるため大きさの指定は不要
     print(String(1 << lgn));
     for (let i = 0; i < (1 << lgn); i++) {
         ary[i] = rand() % 10000;
@@ -92,4 +92,4 @@ function main() {
     print("\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ

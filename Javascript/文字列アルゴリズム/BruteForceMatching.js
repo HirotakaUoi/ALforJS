@@ -78,4 +78,4 @@ function main() {
         print("Pattern matched! at " + result + "\n");
 }
 
-if (isNode) main();      // ブラウザでは「実行」ボタンから main() を呼ぶ
+if (isNode) main();     // ブラウザでは「実行」ボタンから main() を呼ぶ
