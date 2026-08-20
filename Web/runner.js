@@ -289,8 +289,12 @@ function watchAlive() {
 }
 
 function run() {
-    const highlight = chkHighlight.checked;
     let src = normalizeSource(document.getElementById('code').value);
+    // 動作ハイライトは「実行中に記録して、あとから再生する」方式なので、
+    // 実時間で描き進むスケッチには使えない（キャンバスだけ先に描き終わってしまう）
+    const isSketch = /\bfunction\s+(setup|draw)\s*\(/.test(src);
+    const highlight = chkHighlight.checked && !isSketch;
+    const highlightSkipped = chkHighlight.checked && isSketch;
     if (highlight) src = instrument(src);
     resetReplay();
     traceMode = highlight;
@@ -301,6 +305,9 @@ function run() {
     autoShown = false;
     if (!openedByUser) setCanvas(false);   // 前回自動で開いたキャンバスは閉じておく
     addLine('l-sys', '— 実行を開始しました —');
+    if (highlightSkipped) {
+        addLine('l-sys', '— スケッチでは動作ハイライトは使えません（描画が実時間で進むため）—');
+    }
     setRunning(true);
     // キャンバスを使いそうなときだけ p5.js を読み込む
     const needP5 = CANVAS_ENABLED && /\b(setup|draw|createCanvas)\s*\(/.test(src);
