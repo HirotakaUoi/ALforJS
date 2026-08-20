@@ -46,6 +46,7 @@ function ioLibrary() {
     window.close = function () { };               // Node版と形を合わせるだけ
 
     window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'fit') { fitAllCanvases(); return; }
         if (e.data && e.data.type === 'input-response' && window.__resolveInput) {
             var r = window.__resolveInput;
             window.__resolveInput = null;
@@ -93,6 +94,28 @@ function ioLibrary() {
     window.addEventListener('unhandledrejection', function (e) {
         window.__reportError((e.reason && e.reason.message) || e.reason);
     });
+
+    // 枠より大きいキャンバスは、縦横比を保ったまま縮めて全体が見えるようにする。
+    // CSS の max-width だけでは縦横比が崩れ、object-fit で余白を作るとマウス座標がずれるので、
+    // 幅と高さの両方をこちらで決める（p5 はこの縮小ぶんを考えて mouseX / mouseY を出してくれる）
+    function fitCanvas(c) {
+        var w = parseFloat(c.style.width), h = parseFloat(c.style.height);
+        if (!w || !h) return;                     // p5 がまだ大きさを付けていない
+        // 前に縮めたままの値を読んでしまわないよう、そのときは元の大きさに戻して考える
+        if (c.__fitS && Math.abs(w - Math.round(c.__fitW * c.__fitS)) <= 1) { w = c.__fitW; h = c.__fitH; }
+        c.__fitW = w;
+        c.__fitH = h;
+        c.__fitS = Math.min(1, window.innerWidth / w, window.innerHeight / h);
+        c.style.width = Math.round(w * c.__fitS) + 'px';
+        c.style.height = Math.round(h * c.__fitS) + 'px';
+    }
+    function fitAllCanvases() {
+        if (!window.innerWidth || !window.innerHeight) return;   // 枠がまだ開いていない
+        var list = document.querySelectorAll('canvas');
+        for (var i = 0; i < list.length; i++) fitCanvas(list[i]);
+    }
+    window.addEventListener('resize', fitAllCanvases);
+    window.__fitCanvases = fitAllCanvases;        // 枠が開いたときに実行環境から呼ばれる
 
     // <canvas> が作られたら実行環境に知らせる（p5 でも素の canvas でも拾える）
     new MutationObserver(function (records) {

@@ -77,10 +77,14 @@
 <dialog id="settings">
   <h2>設定</h2>
   <div class="p5-only">
-    <label for="setP5">p5.js の URL</label>
+    <label for="setP5">p5.js の URL（2 系・通常はこちら）</label>
     <input type="text" id="setP5" spellcheck="false">
-    <div class="note">キャンバスを使うプログラムのときだけ読み込まれます。オフラインで使うときは、
-      ローカルに置いた p5.min.js への相対パス（例: <code>lib/p5.min.js</code>）を指定してください。</div>
+    <label for="setP51">p5.js の URL（1 系・preload() を使うスケッチ用）</label>
+    <input type="text" id="setP51" spellcheck="false">
+    <div class="note">キャンバスを使うプログラムのときだけ読み込まれます。
+      <code>preload()</code> は 2 系で廃止されたので、それを使うスケッチは自動で 1 系のほうで実行します。
+      オフラインで使うときは、ローカルに置いた p5.min.js への相対パス
+      （例: <code>lib/p5.min.js</code>）を指定してください。</div>
   </div>
   <label for="setAccent">アクセント色</label>
   <input type="text" id="setAccent" spellcheck="false">

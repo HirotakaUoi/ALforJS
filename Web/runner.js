@@ -15,6 +15,7 @@ const CANVAS_ENABLED = document.body.dataset.canvas === 'on';
 // ====== 設定（localStorage に保存。file:// でも効く）======
 const DEFAULTS = {
     p5url: 'https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js',
+    p5url1: 'https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js',
     accent: '#f0a83d',
 };
 function loadSettings() {
@@ -90,7 +91,7 @@ function instrument(src) {
 const TAG = String.fromCharCode(60) + 'script';
 const TAGC = String.fromCharCode(60) + '/script>';
 
-function buildSrcDoc(studentCode, needP5, traceOn) {
+function buildSrcDoc(studentCode, p5src, traceOn) {
     // io.js の中身をそのまま iframe の中へ持ち込む
     const lib = 'window.__traceOn = ' + (traceOn ? 'true' : 'false') + ';\n'
         + '(' + ioLibrary.toString() + ')();';
@@ -99,6 +100,26 @@ function buildSrcDoc(studentCode, needP5, traceOn) {
     // （setup を書かず draw だけのスケッチもあるので、どちらかがあればスケッチとみなす）
     const boot = [
         'var __isSketch = typeof setup === "function" || typeof draw === "function";',
+        // p5 はスケッチの中で起きた例外を自前で受け止めてしまい、window.onerror に
+        // 届かないことがある（キャンバスが真っ黒なまま何も出ない）。包んで必ず表示する。
+        // draw() は毎フレーム回るので、一度出したら止める
+        'var __failed = false;',
+        '["preload", "setup", "draw"].forEach(function (name) {',
+        '  var f = window[name];',
+        '  if (typeof f !== "function") return;',
+        '  window[name] = function () {',
+        '    try {',
+        '      var r = f.apply(this, arguments);',
+        '      return (r && typeof r.then === "function") ? r.then(null, __sketchError) : r;',
+        '    } catch (e) { __sketchError(e); }',
+        '  };',
+        '});',
+        'function __sketchError(e) {',
+        '  if (__failed) return;',
+        '  __failed = true;',
+        '  window.__reportError((e && e.message) || e);',
+        '  if (typeof window.noLoop === "function") { try { noLoop(); } catch (x) {} }',
+        '}',
         '(async function(){',
         '  try {',
         '    if (typeof main === "function") { await main(); }',
@@ -109,9 +130,12 @@ function buildSrcDoc(studentCode, needP5, traceOn) {
     ].join('\n');
 
     return '<!DOCTYPE html><html><head><meta charset="utf-8">'
-        + '<style>html,body{margin:0;background:#111116;overflow:hidden;}</style>'
+        // キャンバスは枠の中央に置く（大きすぎるものを縮めるのは io.js の側）
+        + '<style>html,body{margin:0;height:100%;background:#111116;overflow:hidden;}'
+        + 'body{display:flex;align-items:center;justify-content:center;}'
+        + 'canvas{display:block;}</style>'
         + TAG + '>' + lib + TAGC
-        + (needP5 ? TAG + ' src="' + settings.p5url + '">' + TAGC : '')
+        + (p5src ? TAG + ' src="' + p5src + '">' + TAGC : '')
         + '</head><body>'
         + TAG + '>' + studentCode + TAGC
         + TAG + '>' + boot + TAGC
@@ -209,7 +233,17 @@ function setCanvas(open) {
     canvasOpen = open;
     mainEl.classList.toggle('canvas-open', open);
     btnCanvas.querySelector('.tri').classList.toggle('open', open);
+    if (open) sendFit();
 }
+
+// キャンバスを枠に収め直させる。枠が 0 幅の間は iframe 側が何も測れないので、
+// 開くアニメーション（.15s）が終わってから頼む。p5 の初期化が遅れることもあるので二度送る
+function sendFit() {
+    [200, 800].forEach((ms) => setTimeout(() => {
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'fit' }, '*');
+    }, ms));
+}
+window.addEventListener('resize', () => { if (canvasOpen) sendFit(); });
 if (btnCanvas) btnCanvas.onclick = () => { openedByUser = !canvasOpen; setCanvas(!canvasOpen); };
 
 // ====== 実行 ======
@@ -270,7 +304,14 @@ function run() {
     setRunning(true);
     // キャンバスを使いそうなときだけ p5.js を読み込む
     const needP5 = CANVAS_ENABLED && /\b(setup|draw|createCanvas)\s*\(/.test(src);
-    renewFrame().srcdoc = buildSrcDoc(src, needP5, highlight);
+    // preload() は p5.js 2 で廃止された。web で拾ってきた 1 系向けのスケッチは
+    // そのままでは読み込みが動かないので、見つけたら 1 系のほうで実行する
+    const usesPreload = needP5 && /\bfunction\s+preload\s*\(/.test(src);
+    if (usesPreload) {
+        addLine('l-sys', '— preload() があるので p5.js 1 系で実行します（2 では呼ばれないため）—');
+    }
+    const p5src = needP5 ? (usesPreload ? settings.p5url1 : settings.p5url) : '';
+    renewFrame().srcdoc = buildSrcDoc(src, p5src, highlight);
     watchAlive();
 }
 
@@ -326,17 +367,20 @@ libHead.onclick = () => {
 const dlg = document.getElementById('settings');
 document.getElementById('btnSettings').onclick = () => {
     document.getElementById('setP5').value = settings.p5url;
+    document.getElementById('setP51').value = settings.p5url1;
     document.getElementById('setAccent').value = settings.accent;
     dlg.showModal();
 };
 document.getElementById('setCancel').onclick = () => dlg.close();
 document.getElementById('setReset').onclick = () => {
     document.getElementById('setP5').value = DEFAULTS.p5url;
+    document.getElementById('setP51').value = DEFAULTS.p5url1;
     document.getElementById('setAccent').value = DEFAULTS.accent;
 };
 document.getElementById('setSave').onclick = () => {
     settings = {
         p5url: document.getElementById('setP5').value.trim() || DEFAULTS.p5url,
+        p5url1: document.getElementById('setP51').value.trim() || DEFAULTS.p5url1,
         accent: document.getElementById('setAccent').value.trim() || DEFAULTS.accent,
     };
     localStorage.setItem('algo-runner-settings', JSON.stringify(settings));
