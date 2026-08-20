@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function selectionSort(s, N) {
+function selectionSort(s) {
+    const N = s.length;
     let min, temp;
     for (let i = 0; i < N - 1; i++) {
         for (let k = 0; k < N; k++) {
@@ -23,7 +24,7 @@ function selectionSort(s, N) {
 async function main() {
     const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0,];
 // // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
-    const N = 11;
+    const N = s.length;
 // const s = [4, 5, 2, 8, 7, 1];
 // const N = 6;
 
@@ -31,7 +32,7 @@ async function main() {
 // const N = 7;
 
 
-    selectionSort(s, N);
+    selectionSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

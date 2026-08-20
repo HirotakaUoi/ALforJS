@@ -54,11 +54,13 @@ function qsort(s, first, last) {
   }
 }
 
-function quickSort(s, N) {
+function quickSort(s) {
+  const N = s.length;
   qsort(s, 0, N - 1);
 }
 
-function search1(s, N, d) {
+function search1(s, d) {
+  const N = s.length;
   for (let i = 0; i < N; i++) {
     if (d === s[i]) {
       output("Found: " + d + " at index " + i + "\n");
@@ -69,7 +71,8 @@ function search1(s, N, d) {
   return 0;
 }
 
-function bsearch1(s, N, d) {
+function bsearch1(s, d) {
+  const N = s.length;
   let i, first, last, center;
   first = 0;
   last = N - 1;
@@ -99,7 +102,7 @@ async function main() {
   for (let i = 0; i < N; i++) {
     s[i] = rand() % 100000;
   }
-  quickSort(s, N);
+  quickSort(s);
   for (let k = 0; k < N - 1; k++) {
     output(s[k] + " ");
   }
@@ -107,8 +110,8 @@ async function main() {
 
   const d = parseInt(await input("Input search number: "), 10);
 
-  search1(s, N, d);
-  bsearch1(s, N, d);
+  search1(s, d);
+  bsearch1(s, d);
 }
 
 main().finally(close);

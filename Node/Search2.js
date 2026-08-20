@@ -4,7 +4,7 @@ require("./io.js");
 
 async function main() {
     const s = [4, 5, 2, 8, 7, 1, 9, 0, 99999];  //配列の最後にとりあえず 99999 を置いておく
-    const N = 8;    // 99999は除いた大きさ
+    const N = s.length - 1;     // 99999は除いた大きさ
 
     const d = parseInt(await input("Input search number: "), 10);
     s[N] = d;   //配列の最後(99999の位置)にdを置く

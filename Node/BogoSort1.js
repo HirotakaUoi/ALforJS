@@ -4,7 +4,8 @@ require("./io.js");
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
 
-function shuffle(s, N) {
+function shuffle(s) {
+    const N = s.length;
     let k, temp;
 
     for (let i = N - 1; i > 0; --i) {
@@ -15,7 +16,8 @@ function shuffle(s, N) {
     }
 }
 
-function bogoSort(s, N) {
+function bogoSort(s) {
+    const N = s.length;
     let count = 1;
     let swapped;
 
@@ -32,13 +34,13 @@ function bogoSort(s, N) {
             }
         }
         if (!swapped) break;
-        shuffle(s, N);
+        shuffle(s);
     }
 }
 
 async function main() {
     const s = [4, 5, 2];
-    const N = 3;
+    const N = s.length;
 // const s = [4, 5, 2, 9, 3];
 // const N = 5;
 // const s = [4, 5, 2, 7, 1, 9, 3];
@@ -48,7 +50,7 @@ async function main() {
 // const s = [4, 5, 8, 2, 7, 1, 9, 0, 3, 10];
 // const N = 13;
 
-    bogoSort(s, N);
+    bogoSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

@@ -12,7 +12,8 @@ function flip(s, k) {
 }
 
 // Pancake Sortアルゴリズム
-function pancakeSort(s, N) {
+function pancakeSort(s) {
+    const N = s.length;
     for (let i = N; i > 1; --i) {
         // 最大要素のインデックスを探す
         let max_index = 0;
@@ -43,11 +44,11 @@ function pancakeSort(s, N) {
 
 async function main() {
     const s = [5, 4, 8, 2, 7, 0, 1];
-    const N = 7;
+    const N = s.length;
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,
 // -100, 2]; const N = 19;
 
-    pancakeSort(s, N);
+    pancakeSort(s);
 
     // ソート後のリストを表示
     for (let k = 0; k < N; k++) {

@@ -48,7 +48,8 @@ function rebuildHeap(s, max) {
     }
 }
 
-function heapSort(s, N) {
+function heapSort(s) {
+    const N = s.length;
     let i;
     for (i = 1; i < N; i++) {
         insertHeap(s, i);
@@ -72,9 +73,9 @@ async function main() {
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
     const s = [4, 5, 2, 8, 7, 10, 1, 11, 6, 3, 9, 12, -2];
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
-    const N = 13;
+    const N = s.length;
 
-    heapSort(s, N);
+    heapSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function sleepkSort(s, N) {
+function sleepkSort(s) {
+    const N = s.length;
     for (let i = 0; i < N; ++i) {
         // setTimeoutでスレッドの代わりにタイマーを作成
         // （Node.jsはすべてのタイマーが終わるまでプロセスを終了しないので、
@@ -15,14 +16,14 @@ function sleepkSort(s, N) {
 
 async function main() {
     const s = [30, 9, 5, 15, 8, 6, 1];
-    const N = 7;
+    const N = s.length;
 
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }
     output("\n");
 
-    sleepkSort(s, N);
+    sleepkSort(s);
 }
 
 

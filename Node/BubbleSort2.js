@@ -6,7 +6,8 @@ function rand() {
   return Math.floor(Math.random() * 2147483648);
 }
 
-function bubbleSort(s, N) {
+function bubbleSort(s) {
+  const N = s.length;
   let temp;
   for (let i = 0; i < N - 1; i++)
     for (let j = 0; j < N - 1; j++)
@@ -29,7 +30,7 @@ async function main() {
   }
   output("\n");
 
-  bubbleSort(s, N);
+  bubbleSort(s);
   for (let k = 0; k < N; k++) {
     output(s[k] + " ");
   }

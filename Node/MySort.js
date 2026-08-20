@@ -33,16 +33,17 @@ function qsort(s, first, last, b) {
     }
 }
 
-function mySort(s, N) {
+function mySort(s) {
+    const N = s.length;
     const b = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     qsort(s, 0, N - 1, b);
 }
 
 async function main() {
     const s = [4, 6, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
-    const N = 13;
+    const N = s.length;
 
-    mySort(s, N);
+    mySort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

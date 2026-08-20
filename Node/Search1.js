@@ -4,7 +4,7 @@ require("./io.js");
 
 async function main() {
     const s = [4, 5, 2, 8, 7, 1, 9, 0];
-    const N = 8;    //配列の大きさをNという定数にする
+    const N = s.length;     //配列の大きさをNという定数にする
 
     const d = parseInt(await input("Input search number: "), 10);   //入力タイミングの提示
 

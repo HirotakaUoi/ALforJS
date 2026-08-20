@@ -71,7 +71,8 @@ function qsort(s, first, last) {
     }
 }
 
-function quickSort(s, N) { qsort(s, 0, N - 1); }
+function quickSort(s) {
+    const N = s.length; qsort(s, 0, N - 1); }
 
 async function main() {
 // const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];
@@ -91,7 +92,7 @@ async function main() {
     }
     output("\n");
 
-    quickSort(s, N);
+    quickSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function mergeSort(s, N) {
+function mergeSort(s) {
+    const N = s.length;
     let msize = 1, i, j, k, base1, base2;
     const b = [];   // JSの配列は自動拡張されるため大きさの指定は不要
 
@@ -53,13 +54,13 @@ async function main() {
 // const s = [4, 5, 2, 3, 7, 10, 8, 1, 9, 6, 0, -1, -2];
     const s = [4, 5, -2, 7, 3, 10, 8, 1, 6, 9, 0, -1, 2];
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
-    const N = 13;
+    const N = s.length;
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }
     output("\n");
 
-    mergeSort(s, N);
+    mergeSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

@@ -4,7 +4,8 @@ require("./io.js");
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
 
-function bubbleSort(s, N) {
+function bubbleSort(s) {
+    const N = s.length;
     let temp;
 
     for (let i = 0; i < N - 1; i++)
@@ -16,7 +17,8 @@ function bubbleSort(s, N) {
             }
 }
 
-function selectionSort(s, N) {
+function selectionSort(s) {
+    const N = s.length;
     let min, temp;
     for (let i = 0; i < N - 1; i++) {
         // for (let k=0; k<N; k++) {
@@ -33,7 +35,8 @@ function selectionSort(s, N) {
     }
 }
 
-function insertionSort(s, N) {
+function insertionSort(s) {
+    const N = s.length;
     let j, temp;
     for (let i = 0; i < N - 1; i++) {
 //      for (let k=0; k<N; k++) {
@@ -50,7 +53,8 @@ function insertionSort(s, N) {
     }
 }
 
-function shellSort(s, N) {
+function shellSort(s) {
+    const N = s.length;
     let temp, i, j, h;
 
     h = 1;
@@ -125,7 +129,8 @@ function qsort(s, first, last) {
     }
 }
 
-function quickSort(s, N) {
+function quickSort(s) {
+    const N = s.length;
     qsort(s, 0, N - 1);
 }
 
@@ -142,7 +147,7 @@ async function main() {
 // //   output("\n");
 
     // output("BubbleSort Start!!\n");
-    // bubbleSort(s, N);
+    // bubbleSort(s);
     // output("BubbleSort End!!\n");
     // for (let k=0; k<N-1; k++) {
     //  output(s[k] + " ");
@@ -152,7 +157,7 @@ async function main() {
     //  s[i] = (rand() % 1000000);
     // }
     // output("SelectionSort Start!!\n");
-    // selectionSort(s, N);
+    // selectionSort(s);
     // output("SelectionSort End!!\n");
 
     // for (let i = 0; i < N; i++) {
@@ -160,7 +165,7 @@ async function main() {
     //  s[i] = 1000000-i;
     // }
     // output("InsertionSort Start!!\n");
-    // insertionSort(s, N);
+    // insertionSort(s);
     // output("InsertionSort End!!\n");
 
     for (let i = 0; i < N; i++) {
@@ -169,14 +174,14 @@ async function main() {
 
     }
     output("ShellSort Start!!\n");
-    shellSort(s, N);
+    shellSort(s);
     output("ShellSort End!!\n");
 
     // for (let i = 0; i < N; i++) {
     //  s[i] = (rand() % 1000000);
     // }
     // output("QuickSort Start!!\n");
-    // quickSort(s, N);
+    // quickSort(s);
     // output("QuickSort End!!\n");
 }
 

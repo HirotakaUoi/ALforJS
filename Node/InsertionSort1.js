@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function insertionSort(s, N) {
+function insertionSort(s) {
+    const N = s.length;
     let j, temp;
 
     for (let i = 0; i < N - 1; i++) {
@@ -22,11 +23,11 @@ function insertionSort(s, N) {
 
 async function main() {
     const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
-    const N = 9;
+    const N = s.length;
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
 // const N = 13;
 
-    insertionSort(s, N);
+    insertionSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

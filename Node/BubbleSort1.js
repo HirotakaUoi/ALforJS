@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function bubbleSort(s, N) {
+function bubbleSort(s) {
+  const N = s.length;
   let temp;
   for (let i = 0; i < N - 1; i++) {
     for (let k = 0; k < N; k++) {
@@ -20,13 +21,13 @@ function bubbleSort(s, N) {
 
 async function main() {
   const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
-  const N = 9;
+  const N = s.length;
 // const s = [4, 5, 2, 8, 7, 1];
 // const N = 6;
 // const s = [5, 4, 8, 2, 7, 0, 1];
 // const N = 7;
 
-  bubbleSort(s, N);
+  bubbleSort(s);
   for (let k = 0; k < N; k++) {
     output(s[k] + " ");
   }

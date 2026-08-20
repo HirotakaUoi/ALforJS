@@ -58,7 +58,8 @@ function qsort(s, first, last) {
     }
 }
 
-function quickSort(s, N) {
+function quickSort(s) {
+    const N = s.length;
     qsort(s, 0, N - 1);
 }
 
@@ -67,13 +68,13 @@ async function main() {
 // const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];  （元のC++では二重定義のためコメント化）
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
     const s = [4, 5, 2, 11, 6, 10, 1, 9, 3, 0, -1, -2, 12];
-    const N = 13;
+    const N = s.length;
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }
     output("\n");
 
-    quickSort(s, N);
+    quickSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

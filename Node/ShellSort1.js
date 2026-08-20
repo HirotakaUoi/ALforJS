@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function shellSort(s, N) {
+function shellSort(s) {
+    const N = s.length;
     let temp, i, j, h;
 
     h = 1;
@@ -35,14 +36,14 @@ function shellSort(s, N) {
 
 async function main() {
     const s = [8, 3, 4, 1, 7, 6, 9, 5, 0];
-    const N = 9;
+    const N = s.length;
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -2, -1, 6];
 // const N = 14;
 // const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
 // const N = 9;
 
 
-    shellSort(s, N);
+    shellSort(s);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

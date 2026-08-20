@@ -2,7 +2,8 @@
 require("./io.js");
 // ==========================================
 
-function radixSort(s, N, max) {
+function radixSort(s, max) {
+    const N = s.length;
     let i, j, k, n;
 
     // C++の vector<int> b[10] 相当：10個の空配列（配列リテラルで十分）
@@ -33,7 +34,7 @@ function radixSort(s, N, max) {
 
 async function main() {
     const s = [345, 98, 302, 719, 804, 620, 183, 431, 572];
-    const N = 9;
+    const N = s.length;
 // const s = new Array(20);
 // const N = 20;
     // for (let i = 0; i < N; i++) {
@@ -43,7 +44,7 @@ async function main() {
         output(s[k] + " ");
     }
     output("\n");
-    radixSort(s, N, 1000);
+    radixSort(s, 1000);
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

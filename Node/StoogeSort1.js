@@ -19,7 +19,7 @@ function stoogeSort(s, i, j) {
 
 async function main() {
     const s = [5, 4, 8, 2, 7, 0, 1];
-    const N = 7;
+    const N = s.length;
 
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");

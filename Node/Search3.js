@@ -5,7 +5,7 @@ require("./io.js");
 async function main() {
 
     const s = [0, 1, 2, 4, 5, 7, 8, 9];
-    const N = 8;
+    const N = s.length;
     let i;
 
     const d = parseInt(await input("Input search number: "), 10);
