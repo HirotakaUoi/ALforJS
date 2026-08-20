@@ -43,29 +43,57 @@ document.getElementById('libCode').textContent = LIB_TEXT;
 
 // ====== 貼り付けられたソースを、この環境で動く形に整える ======
 // Node版をファイルごと貼っても動くように、環境依存の行を取り除く
+// 取り除く行は「消す」のではなく「空行にする」。こうするとコード欄と行番号が
+// ぴったり一致するので、実行行のハイライトがそのまま使える
 function normalizeSource(src) {
-    let lines = src.replace(/\r\n/g, '\n').split('\n');
+    const lines = src.replace(/\r\n/g, '\n').split('\n');
 
     // 1. 先頭の共通ブロック（「// ======…」で始まり「// ====…」だけの行で終わる）
     if (/^\/\/ =+/.test((lines[0] || '').trim())) {
         const end = lines.findIndex(l => /^\/\/ =+$/.test(l.trim()));
-        if (end > 0) lines = lines.slice(end + 1);
+        if (end > 0) for (let i = 0; i <= end; i++) lines[i] = '';
     }
-    // 2. require( を含む行（Node専用）
-    lines = lines.filter(l => !/\brequire\s*\(/.test(l));
-    // 3. main() を呼び出しているだけの行（実行はこの環境が行う）
-    lines = lines.filter(l => !/^\s*(if\s*\(\s*isNode\s*\)\s*)?main\s*\(\s*\)\s*(\.\s*\w+\s*\([^)]*\))?\s*;/.test(l));
+    for (let i = 0; i < lines.length; i++) {
+        // 2. require( を含む行（Node専用）
+        if (/\brequire\s*\(/.test(lines[i])) lines[i] = '';
+        // 3. main() を呼び出しているだけの行（実行はこの環境が行う）
+        if (/^\s*(if\s*\(\s*isNode\s*\)\s*)?main\s*\(\s*\)\s*(\.\s*\w+\s*\([^)]*\))?\s*;/.test(lines[i])) lines[i] = '';
+    }
+    return lines.join('\n');
+}
 
-    return lines.join('\n').replace(/^\n+/, '').replace(/\s+$/, '');
+// ====== 動作ハイライト用に、行の頭へ目印を挿し込む ======
+// 各文の先頭に __L(行番号) を置くだけ。__L は現在の行を覚えるだけの軽い関数なので、
+// 挿し込んでもプログラムの結果は変わらない。
+//
+// 波かっこを省いた制御文の本体（for (…) の次の行など）に挿すと構造が壊れるため、
+// 「直前の実コード行が ; { } のどれかで終わっている」ときだけ挿す。
+// 途中で改行した式の続き（行末が ) や && や = など）も、この条件で自然に除外される。
+function instrument(src) {
+    const lines = src.split('\n');
+    let prev = '';
+    for (let i = 0; i < lines.length; i++) {
+        const t = lines[i].trim();
+        if (t === '' || t.startsWith('//')) continue;
+        const startsStatement = /[;{}]$/.test(prev) || prev === '';
+        const skip = /^[}\])]/.test(t) || /^(else|case|default|do)\b/.test(t);
+        if (startsStatement && !skip) {
+            const indent = lines[i].match(/^\s*/)[0];
+            lines[i] = indent + '__L(' + (i + 1) + ');' + lines[i].slice(indent.length);
+        }
+        prev = t;
+    }
+    return lines.join('\n');
 }
 
 // ====== iframe に流し込む HTML を組み立てる ======
 const TAG = String.fromCharCode(60) + 'script';
 const TAGC = String.fromCharCode(60) + '/script>';
 
-function buildSrcDoc(studentCode, needP5) {
+function buildSrcDoc(studentCode, needP5, traceOn) {
     // io.js の中身をそのまま iframe の中へ持ち込む
-    const lib = '(' + ioLibrary.toString() + ')();';
+    const lib = 'window.__traceOn = ' + (traceOn ? 'true' : 'false') + ';\n'
+        + '(' + ioLibrary.toString() + ')();';
 
     // main() があれば呼ぶ。setup() や draw() があるスケッチなら p5 が自動で動かす
     // （setup を書かず draw だけのスケッチもあるので、どちらかがあればスケッチとみなす）
@@ -227,7 +255,12 @@ function watchAlive() {
 }
 
 function run() {
-    const src = normalizeSource(document.getElementById('code').value);
+    const highlight = chkHighlight.checked;
+    let src = normalizeSource(document.getElementById('code').value);
+    if (highlight) src = instrument(src);
+    resetReplay();
+    traceMode = highlight;
+    setHighlightLine(0);
     term.textContent = '';
     outEl = null;
     clearInputBox();
@@ -237,12 +270,13 @@ function run() {
     setRunning(true);
     // キャンバスを使いそうなときだけ p5.js を読み込む
     const needP5 = CANVAS_ENABLED && /\b(setup|draw|createCanvas)\s*\(/.test(src);
-    renewFrame().srcdoc = buildSrcDoc(src, needP5);
+    renewFrame().srcdoc = buildSrcDoc(src, needP5, highlight);
     watchAlive();
 }
 
 function stop() {
     clearTimeout(aliveTimer);
+    resetReplay();
     renewFrame();
     clearInputBox();
     breakOutput();
@@ -254,15 +288,22 @@ window.addEventListener('message', (e) => {
     if (e.source !== frame.contentWindow) return;
     const d = e.data || {};
     if (d.type === 'ready') clearTimeout(aliveTimer);
-    else if (d.type === 'out') addOutput(d.text);
-    else if (d.type === 'input') askInput();
-    else if (d.type === 'error') { addError(d.message); setRunning(false); }
+    else if (d.type === 'trace') pushTrace(d.items);
+    else if (d.type === 'traceoff') {
+        pushTrace([{ sys: '— 記録が長すぎるので、ここから先はハイライトなしで表示します —' }]);
+    }
+    // ハイライト中は、記録を打ち切ったあとの出力も再生の列に並べる（順序を保つため）
+    else if (d.type === 'out') { if (traceMode) pushTrace([d.text]); else addOutput(d.text); }
+    else if (d.type === 'input') afterReplayDone(askInput);
+    else if (d.type === 'error') afterReplayDone(() => { addError(d.message); setRunning(false); });
     else if (d.type === 'canvas') { if (!autoShown) { autoShown = true; setCanvas(true); } }
     else if (d.type === 'done') {
-        breakOutput();
-        addLine('l-sys', d.sketch ? '— スケッチを実行中です —' : '— 実行が終わりました —');
-        // スケッチは draw() が回り続けるので、中止ボタンは押せるままにする
-        setRunning(d.sketch, true);
+        afterReplayDone(() => {
+            breakOutput();
+            addLine('l-sys', d.sketch ? '— スケッチを実行中です —' : '— 実行が終わりました —');
+            // スケッチは draw() が回り続けるので、中止ボタンは押せるままにする
+            setRunning(d.sketch, true);
+        });
     }
 });
 
@@ -302,6 +343,149 @@ document.getElementById('setSave').onclick = () => {
     document.documentElement.style.setProperty('--accent', settings.accent);
     dlg.close();
 };
+
+// ====== 動作ハイライト ======
+const chkHighlight = document.getElementById('chkHighlight');
+const hlLine = document.getElementById('hlLine');
+const codeArea = document.getElementById('code');
+
+function syncHighlightUI() {
+    document.body.classList.toggle('highlight-on', chkHighlight.checked);
+    if (!chkHighlight.checked) hlLine.hidden = true;
+}
+chkHighlight.checked = localStorage.getItem('algo-runner-highlight') === '1';
+syncHighlightUI();
+chkHighlight.addEventListener('change', () => {
+    localStorage.setItem('algo-runner-highlight', chkHighlight.checked ? '1' : '0');
+    syncHighlightUI();
+});
+
+// 再生中に速さを変えたら、その場で反映する
+document.getElementById('hlSpeed').addEventListener('input', () => {
+    if (!replayTimer) return;
+    clearInterval(replayTimer);
+    replayTimer = null;
+    startReplay();
+});
+
+let hlCurrent = 0;                      // いま光らせている行（1始まり）
+
+// ---- 記録の再生 ----
+// 実行中は iframe 側が行と出力を記録し、ここで少しずつ再生する。
+// 再生が終わるまでは、入力待ちや終了の表示を待たせる。
+let replayQueue = [];
+let replayTimer = null;
+let traceMode = false;          // この実行が動作ハイライト付きかどうか
+let afterReplay = null;                 // 再生し終わってからやること
+
+function replaySpeed() {
+    const el = document.getElementById('hlSpeed');
+    return el ? Number(el.value) : 60;  // 1秒あたりの手数
+}
+
+function stepReplay() {
+    // 速いときは1回のタイマーでまとめて進める
+    const perTick = Math.max(1, Math.round(replaySpeed() / 60));
+    for (let i = 0; i < perTick && replayQueue.length; i++) {
+        const it = replayQueue.shift();
+        if (typeof it === 'number') setHighlightLine(it);
+        else if (typeof it === 'string') addOutput(it);
+        else if (it && it.sys) { breakOutput(); addLine('l-sys', it.sys); }
+    }
+    if (replayQueue.length) return;
+    clearInterval(replayTimer);
+    replayTimer = null;
+    if (afterReplay) { const f = afterReplay; afterReplay = null; f(); }
+}
+
+function startReplay() {
+    if (replayTimer) return;
+    replayTimer = setInterval(stepReplay, Math.max(16, Math.round(1000 / replaySpeed())));
+}
+
+function pushTrace(items) {
+    replayQueue = replayQueue.concat(items);
+    startReplay();
+}
+
+// 再生待ちが残っていれば、それが終わってから実行する
+function afterReplayDone(fn) {
+    if (!replayQueue.length && !replayTimer) fn();
+    else afterReplay = fn;
+}
+
+function resetReplay() {
+    clearInterval(replayTimer);
+    replayTimer = null;
+    replayQueue = [];
+    afterReplay = null;
+    traceMode = false;
+}
+
+function drawHighlight() {
+    if (!hlCurrent) { hlLine.hidden = true; return; }
+    const cs = getComputedStyle(codeArea);
+    const lh = parseFloat(cs.lineHeight);
+    const padTop = parseFloat(cs.paddingTop);
+    const top = padTop + (hlCurrent - 1) * lh - codeArea.scrollTop;
+    hlLine.style.top = top + 'px';
+    hlLine.style.height = lh + 'px';
+    hlLine.hidden = false;
+
+    // 画面の外に出ていたら、そこまでスクロールして見せる
+    const view = codeArea.clientHeight;
+    if (top < 0) codeArea.scrollTop += top - lh;
+    else if (top + lh > view) codeArea.scrollTop += top + lh - view + lh;
+}
+
+function setHighlightLine(n) {
+    hlCurrent = n;
+    drawHighlight();
+}
+codeArea.addEventListener('scroll', drawHighlight);
+
+// ====== エディタとターミナルの境目をドラッグして高さを変える ======
+const DEFAULT_TERM_HEIGHT = 260;
+const splitter = document.getElementById('splitter');
+const termWrap = document.getElementById('termWrap');
+
+function setTermHeight(px, save) {
+    const left = termWrap.parentNode;
+    // エディタ側にも最低限の高さを残す
+    const max = Math.max(120, left.clientHeight - 180);
+    const h = Math.min(Math.max(Math.round(px), 90), max);
+    termWrap.style.height = h + 'px';
+    if (save) { try { localStorage.setItem('algo-runner-term-height', String(h)); } catch (e) { } }
+}
+
+splitter.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    splitter.setPointerCapture(e.pointerId);
+    splitter.classList.add('dragging');
+    document.body.classList.add('resizing');
+
+    const startY = e.clientY;
+    const startH = termWrap.getBoundingClientRect().height;
+    const onMove = (ev) => setTermHeight(startH - (ev.clientY - startY), false);
+    const onUp = () => {
+        splitter.removeEventListener('pointermove', onMove);
+        splitter.removeEventListener('pointerup', onUp);
+        splitter.classList.remove('dragging');
+        document.body.classList.remove('resizing');
+        setTermHeight(termWrap.getBoundingClientRect().height, true);
+    };
+    splitter.addEventListener('pointermove', onMove);
+    splitter.addEventListener('pointerup', onUp);
+});
+
+// ダブルクリックで既定の高さに戻す
+splitter.addEventListener('dblclick', () => setTermHeight(DEFAULT_TERM_HEIGHT, true));
+
+// 前回の高さを復元する
+const savedHeight = Number(localStorage.getItem('algo-runner-term-height'));
+if (savedHeight) setTermHeight(savedHeight, false);
+// 窓の大きさが変わったときは、はみ出さないように収め直す
+window.addEventListener('resize', () => setTermHeight(termWrap.getBoundingClientRect().height, false));
 
 // ====== コードの自動保存 ======
 // 無限ループでページを読み込み直すことがあるので、書いたコードは常に控えておく

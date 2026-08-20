@@ -18,7 +18,7 @@ function bitonicSort(s, N) {
                 output("fb= " + fb + " sb= " + sb + " i= " + i + " i^(1<<sb)= " + (i ^ (1 << sb)));
                 output(" (i>>fb)= " + (i >> fb) + " (i>>sb)= " + (i >> sb));
                 if ((((i >> fb) & 1) ^ ((i >> sb) & 1))) {
-                        output(" C " + " s[i]= " + s[i] + " s[i^(1<<sb)]= "
+                    output(" C " + " s[i]= " + s[i] + " s[i^(1<<sb)]= "
                         + s[i ^ (1 << sb)] + " " + Number(((((i >> fb) & 1) ^ ((i >> sb) & 1)) && (s[i] < s[i ^ (1 << sb)])) ? 1 : 0));
                 }
                 output("\n");
@@ -32,11 +32,11 @@ function bitonicSort(s, N) {
 
 async function main() {
     const logArraySize = parseInt(await input("Input array size by 2^N: "), 10);
-// ( n<<N は nのN bit左シフト == n*(2^N))
+    // ( n<<N は nのN bit左シフト == n*(2^N))
     const s = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     const N = logArraySize;
     for (let i = 0; i < (1 << logArraySize); i++) {
-        s[i] = (rand() % 100);
+        s[i] = (rand() % 10000);
     }
     for (let k = 0; k < (1 << logArraySize); k++) {
         output(s[k] + " ");

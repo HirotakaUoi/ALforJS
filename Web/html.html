@@ -44,13 +44,25 @@
         <div class="card-head">
           <span class="card-title">あなたのコード</span>
           <span class="card-sub">Node/ のソースをそのまま貼り付けられます</span>
+          <span class="spacer"></span>
+          <label class="toggle" title="実行した行を順に光らせます。実行中は記録だけして、あとから再生します">
+            <input type="checkbox" id="chkHighlight"> 動作ハイライト
+          </label>
+          <label class="toggle hl-only" title="再生の速さ（1秒あたりの手数）">
+            速さ <input type="range" id="hlSpeed" min="2" max="600" value="60">
+          </label>
         </div>
-        <textarea id="code" spellcheck="false"></textarea>
+        <div class="editor">
+          <div class="hl-layer"><div class="hl-line" id="hlLine" hidden></div></div>
+          <textarea id="code" spellcheck="false"></textarea>
+        </div>
       </div>
 
     </div>
 
-    <div class="term-wrap">
+    <div class="splitter" id="splitter" title="ドラッグで高さを変える（ダブルクリックで既定に戻す）"></div>
+
+    <div class="term-wrap" id="termWrap">
       <div class="term-label">ターミナル</div>
       <div id="terminal"></div>
     </div>

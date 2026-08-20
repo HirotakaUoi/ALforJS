@@ -1,0 +1,16 @@
+{
+    // 使い方: デバッグしたい Node/*.js を開いて F5
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "現在のファイルをデバッグ",
+            "program": "${file}",
+            "console": "integratedTerminal",  // input() をターミナルで受け取るため
+            "skipFiles": [
+                "<node_internals>/**"         // Node 内部（readline など）には入らない
+            ]
+        }
+    ]
+}

@@ -24,6 +24,8 @@ function ioLibrary() {
     }
 
     function myOutput(s) {
+        // 動作ハイライト中は、出力も行と同じ並びに記録して後から再生する
+        if (window.__traceOn) { trace.push(String(s)); return; }
         buf += String(s);
         if (!timer) timer = setTimeout(flush, 16);
     }
@@ -31,6 +33,7 @@ function ioLibrary() {
     function myInput(msg) {
         myOutput(msg);
         flush();                                  // プロンプトを先に出しきる
+        if (window.__flushTrace) window.__flushTrace();
         parent.postMessage({ type: 'input' }, '*');
         return new Promise(function (resolve) { window.__resolveInput = resolve; });
     }
@@ -50,8 +53,40 @@ function ioLibrary() {
         }
     });
 
+    // ---- 動作ハイライト ----
+    // JavaScript は単一スレッドなので、同期的なループが回っている間はタイマーも
+    // postMessage も動けない。つまり「実行中に今の行を送る」ことは原理的にできない。
+    // そこで実行中は行と出力を記録だけしておき、実行環境（親）が後から再生する。
+    //
+    // trace には数値（行番号）と文字列（出力）が混ざって入る。区別は型でつく。
+    var trace = [];
+    var TRACE_LIMIT = 20000;                      // 長すぎる記録は打ち切る
+
+    window.__L = function (n) {
+        if (!window.__traceOn) return;
+        if (trace.length >= TRACE_LIMIT) { stopTrace(); return; }
+        trace.push(n);
+    };
+
+    function stopTrace() {
+        window.__traceOn = false;
+        flushTrace();
+        parent.postMessage({ type: 'traceoff' }, '*');
+    }
+
+    function flushTrace() {
+        if (trace.length) { parent.postMessage({ type: 'trace', items: trace }, '*'); trace = []; }
+    }
+    window.__flushTrace = flushTrace;
+
+    // p5 のスケッチは draw() が回り続け、終わりが来ない。
+    // また setup() は実行環境の起動処理より後に呼ばれるので、
+    // 記録は定期的にも送っておく（同期的なループの最中はどのみち動けない）
+    if (window.__traceOn) setInterval(flushTrace, 200);
+
     window.__reportError = function (m) {
         flush();
+        flushTrace();
         parent.postMessage({ type: 'error', message: String(m) }, '*');
     };
     window.onerror = function (msg) { window.__reportError(msg); return true; };
@@ -75,6 +110,7 @@ function ioLibrary() {
 
     window.__finish = function (isSketch) {
         flush();
+        flushTrace();
         parent.postMessage({ type: 'done', sketch: !!isSketch }, '*');
     };
 }

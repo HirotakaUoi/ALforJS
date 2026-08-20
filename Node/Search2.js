@@ -7,7 +7,7 @@ async function main() {
     const N = s.length;     //番兵を置く前の大きさ
 
     const d = parseInt(await input("Input search number: "), 10);
-    s[N] = d;   //配列の最後に番兵としてdを追加する（JSの配列は自動で伸びるのでダミーは要らない）
+    s[N] = d;   //配列の最後に番兵としてdを追加する（JSの配列は自動で伸びる）
 
     let i = 0;
     while (s[i] !== d) i++;
