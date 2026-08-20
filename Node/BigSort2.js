@@ -281,61 +281,61 @@ async function main() {
     //  }
     //  output("\n");
 
-    output("1/" + CLOCKS_PER_SEC + "sec unit\n");
+    output("μs unit (performance.now)\n");
 
-    let startTime = clock();
+    let startTime = Math.round(performance.now() * 1000);
     output("QuickSort Start:  " + startTime + "\n");
     quickSort(s, N);
-    let endTime = clock();
+    let endTime = Math.round(performance.now() * 1000);
     output("QuickSort End:    " + endTime + "\n");
     output("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
-    startTime = clock();
+    startTime = Math.round(performance.now() * 1000);
     output("CombSort Start: " + startTime + "\n");
     combSort(z, N);
-    endTime = clock();
+    endTime = Math.round(performance.now() * 1000);
     output("CombSort End:   " + endTime + "\n");
     output("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
-    startTime = clock();
+    startTime = Math.round(performance.now() * 1000);
     output("HeapSort Start:   " + startTime + "\n");
     heapSort(t, N);
-    endTime = clock();
+    endTime = Math.round(performance.now() * 1000);
     output("HeapSort End:     " + endTime + "\n");
     output("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
-    startTime = clock();
+    startTime = Math.round(performance.now() * 1000);
     output("MergeSort Start:  " + startTime + "\n");
     mergeSort(u, N);
-    endTime = clock();
+    endTime = Math.round(performance.now() * 1000);
     output("MergeSort End:    " + endTime + "\n");
     output("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
-    startTime = clock();
+    startTime = Math.round(performance.now() * 1000);
     output("ShellSort Start:  " + startTime + "\n");
     shellSort(v, N);
-    endTime = clock();
+    endTime = Math.round(performance.now() * 1000);
     output("ShellSort End:    " + endTime + "\n");
     output("Processing Time = " + (endTime - startTime) + " μs\n\n");
 
-    // startTime = clock();
+    // startTime = Math.round(performance.now() * 1000);
     // output("InsertionSort Start: " + startTime + "\n");
     // insertionSort(w, N);
-    // endTime = clock();
+    // endTime = Math.round(performance.now() * 1000);
     // output("InsertionSort End:   " + endTime + "\n");
     // output("Processing Time =    " + (endTime - startTime) + " μs\n\n");
 
-    // startTime = clock();
+    // startTime = Math.round(performance.now() * 1000);
     // output("SelectionSort Start: " + startTime + "\n");
     // selectionSort(x, N);
-    // endTime = clock();
+    // endTime = Math.round(performance.now() * 1000);
     // output("SelectionSort End:   " + endTime + "\n");
     // output("Processing Time =    " + (endTime - startTime) + " μs\n\n");
 
-    // startTime = clock();
+    // startTime = Math.round(performance.now() * 1000);
     // output("BubbleSort Start: " + startTime + "\n");
     // bubbleSort(y, N);
-    // endTime = clock();
+    // endTime = Math.round(performance.now() * 1000);
     // output("BubbleSort End:   " + endTime + "\n");
     // output("Processing Time = " + (endTime - startTime) + " μs\n\n");
 

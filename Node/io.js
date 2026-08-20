@@ -24,14 +24,9 @@ function close() {
     rl.close();
 }
 
-// C++の clock() 相当。マイクロ秒を返す
-const CLOCKS_PER_SEC = 1000000;
-
-function clock() {
-    return Number(process.hrtime.bigint() / 1000n);
-}
-
-// 読み込むだけで output / input などが使えるように、グローバルへ登録する。
+// 読み込むだけで output / input が使えるように、グローバルへ登録する。
 // これで各プログラムの共通部分は require("./io.js"); の1行で済み、
 // ブラウザの実行環境（output / input がグローバルにある）と同じ書き方になる。
-Object.assign(globalThis, { output, input, close, clock, CLOCKS_PER_SEC });
+// 時間計測は Node にもブラウザにもある performance.now() をそのまま使うので、
+// ここでは用意しない
+Object.assign(globalThis, { output, input, close });

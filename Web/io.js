@@ -1,11 +1,12 @@
 // ====== 共通の入出力機能（ブラウザ実行環境・変更しない）======
-// Node/io.js のブラウザ版。output / input / close / clock / CLOCKS_PER_SEC を
+// Node/io.js のブラウザ版。output / input / close を
 // グローバルに用意するので、プログラム側の書き方は Node 版とまったく同じになる。
 //
 //   output(s)   : C++の cout << 相当（改行なし出力）
 //   input(msg) : C++の cin >> 相当（呼び出し側は await input(...)）
 //   close()    : Node版と形を合わせるためのもの。ブラウザでは何もしない
-//   clock()    : C++の clock() 相当。マイクロ秒を返す
+//
+// 時間計測は Node にもブラウザにもある performance.now() をそのまま使うので、ここでは用意しない
 //
 // この関数の中身は、実行のたびに文字列化されて iframe の中へ送り込まれる。
 // 出力や入力要求は postMessage で実行環境（親ページ）とやりとりする。
@@ -40,8 +41,6 @@ function ioLibrary() {
     window.output = myOutput;
     window.input = myInput;
     window.close = function () { };               // Node版と形を合わせるだけ
-    window.CLOCKS_PER_SEC = 1000000;
-    window.clock = function () { return Math.round(performance.now() * 1000); };
 
     window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'input-response' && window.__resolveInput) {

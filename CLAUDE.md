@@ -15,8 +15,8 @@
 
 - `C++/` — 元の C++ ソース（参考用。**手を入れない**）
 - `Node/` — **標準版**。全45本＋共通ライブラリ。VSCode で動かすメイン環境
-  - `io.js` — 共通の入出力ライブラリ。`output` / `input` / `close` / `clock` / `CLOCKS_PER_SEC` を
-    `globalThis` に登録するので、各プログラムは `require("./io.js");` の1行だけで済む
+  - `io.js` — 共通の入出力ライブラリ。`output` / `input` / `close` を `globalThis` に登録するので、
+    各プログラムは `require("./io.js");` の1行だけで済む
   - `文字列アルゴリズム/` — BoyerMoore / BruteForceMatching / KMPMatching
     - 同フォルダの `io.js` は `../io.js` への中継。これで共通ブロックが45本すべて同一になる
   - `globals.d.ts` — エディタの補完用（実行には関与しない）
@@ -49,7 +49,11 @@ main().finally(close);
 - `input(msg)` — cin 相当。Promise を返すので **必ず `await input(...)`**、`main()` は `async`
   （ブラウザではキーボード入力を同期で待てないため、両環境とも async に統一）
 - `close()` — 標準入力を閉じる。呼ばないと対話実行時にプロセスが終わらない
-- `clock()` / `CLOCKS_PER_SEC` — BigSort2 の時間計測用。`io.js` が提供する
+- 時間計測（BigSort2）は `performance.now()` をそのまま使う。Node にもブラウザにも標準で入っている
+  ので `io.js` では用意しない。`Math.round(performance.now() * 1000)` で受けてマイクロ秒の整数にし、
+  差を取る側は素の引き算にしてある（浮動小数点の桁がスライドに出ないように）
+  - ブラウザの `performance.now()` は分解能が 0.1ms に丸められる（タイミング攻撃対策）。
+    Node は約1μs。細かく比べたいときは配列サイズを大きめにする
 - `isNode` は使わない（環境差は `io.js` が吸収する）
 
 ## 移植の約束事
@@ -94,6 +98,9 @@ main().finally(close);
    - sandbox付き iframe で実行し、実行のたびに作り直すので状態が残らない
    - 中止ボタン（Esc）、キャンバスの自動開閉、日本語エラー要約、設定画面、コード自動保存
 4. `Javascript/` と不要になったツール（`build-node.js` `genhtml.js` `genplayground.js` `transform*.js` ほか）を削除
+5. **時間計測を `performance.now()` に統一**（`clock()` / `CLOCKS_PER_SEC` の自前実装を廃止）
+   - 動機: C++ の `CLOCKS_PER_SEC` に無理に合わせるより、両環境にある標準関数をそのまま使うほうが素直
+   - `io.js` が提供するのは `output` / `input` / `close` の3つだけになった
 
 **技術的に確定したこと（再調査不要）:**
 

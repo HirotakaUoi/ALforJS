@@ -2,5 +2,3 @@
 declare function output(s: unknown): void;
 declare function input(msg: string): Promise<string>;
 declare function close(): void;
-declare function clock(): number;
-declare const CLOCKS_PER_SEC: number;
