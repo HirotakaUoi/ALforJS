@@ -90,6 +90,22 @@ function ioLibrary() {
         flushTrace();
         parent.postMessage({ type: 'error', message: String(m) }, '*');
     };
+    // p5 は外部ファイルの読み込み失敗などを console.error に出すだけで、例外にはしない。
+    // そのままだと実行環境からは何も見えないので、そのまま転送する（訳さずに原文のまま）
+    var origConsoleError = console.error;
+    console.error = function () {
+        var parts = [];
+        for (var i = 0; i < arguments.length; i++) {
+            var a = arguments[i];
+            parts.push(String(a));            // Error なら "TypeError: ..." の形で出る
+        }
+        flush();
+        flushTrace();
+        var fatal = !!(window.__isFatalConsole && window.__isFatalConsole());
+        parent.postMessage({ type: 'console-error', text: parts.join(' '), fatal: fatal }, '*');
+        origConsoleError.apply(console, arguments);
+    };
+
     window.onerror = function (msg) { window.__reportError(msg); return true; };
     window.addEventListener('unhandledrejection', function (e) {
         window.__reportError((e.reason && e.reason.message) || e.reason);

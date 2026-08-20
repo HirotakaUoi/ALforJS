@@ -108,12 +108,22 @@ function buildSrcDoc(studentCode, p5src, traceOn) {
         '  var f = window[name];',
         '  if (typeof f !== "function") return;',
         '  window[name] = function () {',
+        '    if (name === "draw") __started = true;',
         '    try {',
         '      var r = f.apply(this, arguments);',
-        '      return (r && typeof r.then === "function") ? r.then(null, __sketchError) : r;',
+        '      if (r && typeof r.then === "function") {',
+        '        return r.then(function (v) { if (name === "setup") __started = true; return v; }, __sketchError);',
+        '      }',
+        '      if (name === "setup") __started = true;',
+        '      return r;',
         '    } catch (e) { __sketchError(e); }',
         '  };',
         '});',
+        // console.error を致命的とみなすのは、スケッチがまだ動き出していないときだけ。
+        // preload() の読み込み失敗はここに当たる（setup() が永久に呼ばれない）。
+        // 動き出したあとの読み込み失敗は、絵は描き続けられるので表示だけにする
+        'var __started = false;',
+        'window.__isFatalConsole = function () { return __isSketch && !__started; };',
         'function __sketchError(e) {',
         '  if (__failed) return;',
         '  __failed = true;',
@@ -344,6 +354,13 @@ window.addEventListener('message', (e) => {
     else if (d.type === 'out') { if (traceMode) pushTrace([d.text]); else addOutput(d.text); }
     else if (d.type === 'input') afterReplayDone(askInput);
     else if (d.type === 'error') afterReplayDone(() => { addError(d.message); setRunning(false); });
+    // console.error は原文のまま出す。スケッチが動き出す前のものは
+    // そのまま止まってしまう（preload() の読み込み失敗など）ので実行を打ち切る
+    else if (d.type === 'console-error') afterReplayDone(() => {
+        breakOutput();
+        addLine('l-err', '▶ ' + d.text);
+        if (d.fatal) stop();
+    });
     else if (d.type === 'canvas') { if (!autoShown) { autoShown = true; setCanvas(true); } }
     else if (d.type === 'done') {
         afterReplayDone(() => {
