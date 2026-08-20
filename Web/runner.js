@@ -26,20 +26,37 @@ let settings = loadSettings();
 document.documentElement.style.setProperty('--accent', settings.accent);
 
 // ====== 読み取り専用ブロックに出す説明 ======
-const LIB_TEXT = [
-    '// この2つは実行環境が用意します。プログラム側で書く必要はありません。',
-    '// （Node版の require("./io.js"); と同じ役割です）',
-    '',
-    'function output(s) {',
-    '    // C++の cout << 相当。改行なしでターミナルに出力する',
-    '}',
-    '',
-    'async function input(msg) {',
-    '    // C++の cin >> 相当。ターミナルに入力欄を出し、',
-    '    // Enter が押されるまで待って、入力された文字列を返す',
-    '    // 呼び出し側は  await input("...")  と書く',
-    '}',
-].join('\n');
+// 実物をそのまま見せる。手で書き写すと io.js を直したときに必ずずれるので、
+// 実際に iframe へ送り込んでいる ioLibrary の中身から定義を切り出す
+function pickFunction(src, name) {
+    const start = src.indexOf('function ' + name);
+    if (start < 0) return '';
+    let depth = 0;
+    for (let i = src.indexOf('{', start); i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}' && --depth === 0) {
+            return src.slice(start, i + 1).replace(/\n {4}/g, '\n');   // 1段ぶん左に寄せる
+        }
+    }
+    return '';
+}
+
+const LIB_TEXT = (() => {
+    const src = ioLibrary.toString();
+    const out = pickFunction(src, 'myOutput');
+    const inp = pickFunction(src, 'myInput');
+    const head = [
+        '// この3つは実行環境が用意します。プログラム側で書く必要はありません。',
+        '// （Node版の require("./io.js"); と同じ役割です）',
+        '// 下は Web/io.js の実物で、output / input / close という名前で登録されます。',
+        '',
+        '',
+    ].join('\n');
+    // 切り出せなかったときは io.js 全体を出す（空欄になるよりはよい）
+    if (!out || !inp) return head + src;
+    return head + out + '\n\n' + inp
+        + '\n\nwindow.close = function () { };   // Node版と形を合わせるだけ';
+})();
 document.getElementById('libCode').textContent = LIB_TEXT;
 
 // ====== 貼り付けられたソースを、この環境で動く形に整える ======
@@ -570,7 +587,7 @@ const SAMPLE = [
     'async function main() {',
     '    let d, i, first, last, center;',
     '    const s = [0, 1, 2, 4, 5, 7, 8, 9];',
-    '    const N = 8;',
+    '    const N = s.length;',
     '    d = parseInt(await input("Input search number: "), 10);',
     '    first = 0;',
     '    last = N - 1;',
@@ -592,4 +609,30 @@ const SAMPLE = [
     'main().finally(close);',
 ].join('\n');
 
-codeEl.value = localStorage.getItem('algo-runner-code') || SAMPLE;
+// p5.js版の既定サンプル。テキスト専用のサンプルだと、開いた直後は
+// createCanvas() が呼ばれずキャンバスが出ないため、こちらはスケッチにしてある
+const SKETCH_SAMPLE = [
+    '// p5.js版のサンプルです。createCanvas() を呼ぶとキャンバスが開きます。',
+    '// Node/ のプログラムを貼り付ければ、そのまま実行できます。',
+    '',
+    'const s = [0, 1, 2, 4, 5, 7, 8, 9];',
+    '',
+    'function setup() {',
+    '    const N = s.length;',
+    '    createCanvas(42 * N, 240);',
+    '    noStroke();',
+    '    background(245);',
+    '    for (let i = 0; i < N; i++) {   // 配列の中身を棒の高さで表す',
+    '        const h = (s[i] + 1) * 20;',
+    '        fill(60, 130, 210);',
+    '        rect(42 * i + 5, height - h, 32, h);',
+    '        fill(70);',
+    '        textAlign(CENTER);',
+    '        textSize(13);',
+    '        text(s[i], 42 * i + 21, height - h - 8);',
+    '    }',
+    '}',
+].join('\n');
+
+codeEl.value = localStorage.getItem('algo-runner-code')
+    || (CANVAS_ENABLED ? SKETCH_SAMPLE : SAMPLE);

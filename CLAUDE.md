@@ -78,7 +78,8 @@ main().finally(close);
 ## 実行方法
 
 - **Node**: `node Node/<ファイル名>.js` — 対話入力・パイプ入力（`echo "5" | node ...`）両方可
-- **ブラウザ**: `Web/index.html` をダブルクリック → HTML版 / p5.js版 を選ぶ（サーバー不要）
+- **ブラウザ**: https://hirotakauoi.github.io/ALforJS/ を開く（GitHub Pages。授業ではこちらを配る）。
+  手元のファイルなら `Web/index.html` をダブルクリック → HTML版 / p5.js版 を選ぶ（サーバー不要）
   - `Node/` のソースを**まるごと**コード欄に貼れば動く。`require` 行と末尾の `main()` 呼び出しは
     実行環境が自動で取り除く
   - 実行 = Ctrl/Cmd + Enter、中止 = Esc。書いたコードは `localStorage` に自動保存
@@ -126,6 +127,18 @@ main().finally(close);
      - 理由: `preload()` の失敗は本当に何も始まらないが、`setup()` 以降の `loadImage` 失敗は
        絵を描き続けられる正当なスケッチ（実測: 転送を止めると3秒で `draw()` 180回）。
        一律に中止すると後者を殺してしまう
+6. **`Web/` を GitHub Pages に公開した** — https://hirotakauoi.github.io/ALforJS/
+   - `.github/workflows/pages.yml` で `Web/` の中身をサイトの根に置く。ビルドは不要
+   - Pages のソースは「GitHub Actions」。`gh api --method POST repos/HirotakaUoi/ALforJS/pages -f build_type=workflow` で有効化した
+   - `main` へ push して `Web/**` が変わったときだけ流れる。手動は `gh workflow run "Deploy Web to Pages"`
+   - 公開されるのは `Web/` の6ファイルだけ（`C++/` や `Node/` は配信されない）
+   - 本番で確認済み: 二分探索の入力・出力、p5 スケッチの描画とも正常
+7. **既定サンプルを直した**（`Web/runner.js`）
+   - p5.js版はスケッチ（配列を棒グラフで描く）を既定にした。
+     テキスト専用のサンプルだと `createCanvas()` が呼ばれず、開いた直後にキャンバスが出ないため
+   - `SAMPLE` の `const N = 8;` を `const N = s.length;` に（移植の約束事に合わせた）
+   - 「共通の入出力機能」の欄が**コメントだけで本体が空**だったので、`Web/io.js` の実物を出すようにした。
+     手で書き写すとずれるので、`ioLibrary.toString()` から `myOutput` / `myInput` を切り出している
 
 **技術的に確定したこと（再調査不要）:**
 
