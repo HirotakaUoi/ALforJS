@@ -82,9 +82,11 @@
     <label for="setP51">p5.js の URL（1 系・preload() を使うスケッチ用）</label>
     <input type="text" id="setP51" spellcheck="false">
     <div class="note">キャンバスを使うプログラムのときだけ読み込まれます。
-      <code>preload()</code> は 2 系で廃止されたので、それを使うスケッチは自動で 1 系のほうで実行します。
-      オフラインで使うときは、ローカルに置いた p5.min.js への相対パス
-      （例: <code>lib/p5.min.js</code>）を指定してください。</div>
+      <code>preload()</code> は 2 系で廃止されたので、それを使うスケッチは自動で 1 系のほうで実行します。<br>
+      ネットにつながらない場所で使うときは、p5.js 本体を手元に置いておけます。
+      上の URL をブラウザで開いて <code>p5.min.js</code> として保存し、
+      このページと同じ場所に作った <code>lib</code> フォルダへ入れてから、
+      この欄を <code>lib/p5.min.js</code> に書き換えてください（1 系も同じ手順です）。</div>
   </div>
   <label for="setAccent">アクセント色</label>
   <input type="text" id="setAccent" spellcheck="false">
