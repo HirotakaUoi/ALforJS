@@ -47,15 +47,15 @@ const LIB_TEXT = (() => {
     const inp = pickFunction(src, 'myInput');
     const head = [
         '// この3つは実行環境が用意します。プログラム側で書く必要はありません。',
-        '// （Node版の require("./io.js"); と同じ役割です）',
-        '// 下は Web/io.js の実物で、output / input / close という名前で登録されます。',
+        '// スライドのソースにある require("./io.js"); と同じ役割です。',
+        '// 下がその中身で、output / input / close という名前で使えます。',
         '',
         '',
     ].join('\n');
     // 切り出せなかったときは io.js 全体を出す（空欄になるよりはよい）
     if (!out || !inp) return head + src;
     return head + out + '\n\n' + inp
-        + '\n\nwindow.close = function () { };   // Node版と形を合わせるだけ';
+        + '\n\nwindow.close = function () { };   // 形をそろえるためのもの（何もしません）';
 })();
 document.getElementById('libCode').textContent = LIB_TEXT;
 
@@ -613,7 +613,7 @@ const SAMPLE = [
 // createCanvas() が呼ばれずキャンバスが出ないため、こちらはスケッチにしてある
 const SKETCH_SAMPLE = [
     '// p5.js版のサンプルです。createCanvas() を呼ぶとキャンバスが開きます。',
-    '// Node/ のプログラムを貼り付ければ、そのまま実行できます。',
+    '// スライドのプログラムを貼り付ければ、そのまま実行できます。',
     '',
     'const s = [0, 1, 2, 4, 5, 7, 8, 9];',
     '',
