@@ -78,7 +78,7 @@ main().finally(close);
 ## 実行方法
 
 - **Node**: `node Node/<ファイル名>.js` — 対話入力・パイプ入力（`echo "5" | node ...`）両方可
-- **ブラウザ**: https://hirotakauoi.github.io/ALforJS/ を開く（GitHub Pages。授業ではこちらを配る）。
+- **ブラウザ**: https://js-code-runner.fishbone.jp/ を開く（GitHub Pages。**授業で配るのはこの URL**）。
   手元のファイルなら `Web/index.html` をダブルクリック → HTML版 / p5.js版 を選ぶ（サーバー不要）
   - `Node/` のソースを**まるごと**コード欄に貼れば動く。`require` 行と末尾の `main()` 呼び出しは
     実行環境が自動で取り除く
@@ -87,9 +87,48 @@ main().finally(close);
     枠（400px）より大きいキャンバスは縦横比を保ったまま縮めて全体を表示する
   - p5.js の URL は 2系・1系の2つを「設定」から変更可（アクセント色も同じ画面。
     オフライン用にローカルパスも指定できる）。`preload()` を使うスケッチは自動で1系に切り替わる
+  - **`Web/` の画面に出る文言は学生が読む**。`Node/` `Node版` `Web/io.js` `45本` のような
+    リポジトリの構成を知らないと分からない語は使わない（プログラムの出どころは「スライド」と呼ぶ）
 
 ---
 ## 作業引き継ぎログ
+
+### 2026-08-21
+
+**やったこと（公開の仕上げ）:**
+
+1. **独自ドメインに変えた** — https://js-code-runner.fishbone.jp/
+   - `fishbone.jp` の DNS に CNAME（`js-code-runner` → `hirotakauoi.github.io.`）を置き、
+     Pages の Custom domain に設定。証明書は Let's Encrypt、Enforce HTTPS も有効
+   - `https://hirotakauoi.github.io/ALforJS/` はこの URL へ 301 で転送される
+2. **画面の文言を学生向けに整理した**（`Web/index.html` / `p5.html` / `html.html` / `runner.js`）
+   - `Node/` → 「テキストスライド」、「ソート・探索の45本はこちらで足ります。」を削除、
+     共通の入出力機能の説明から `Node版` `Web/io.js` を外した
+   - 理由: Web版は学生に公開するので、リポジトリの構成を知らないと分からない語は読めない
+3. **設定画面に p5.js を手元に置く手順を書き足した**（`Web/p5.html` / `html.html`）
+   - 「ローカルパスを指定できる」だけでは、ファイルの用意の仕方が分からないため。
+     上の URL をブラウザで開いて保存 → `lib` フォルダへ → 欄を `lib/p5.min.js` に、と書いてある
+
+**技術的に確定したこと（再調査不要）:**
+
+- **ホスト名にアンダースコアは使えない**。最初 `js_code_runner.fishbone.jp` にしたら
+  Pages が「domain contains invalid characters」で Enforce HTTPS を出さなかった
+  - DNS のレコード名としては `_` は許される（`_dmarc` や `_acme-challenge` があるため登録はできる）が、
+    ホスト名は RFC 1123 で英数字とハイフンのみ。認証局は CA/Browser Forum の規定により
+    `_` を含む名前に証明書を発行できない。だから Let's Encrypt から取れず HTTPS にできない
+  - ハイフンに変えたら解決した
+- **独自ドメインを設定すると `github.io` の URL も独自ドメインへ転送される**。
+  証明書が出るまでの間はサイト全体が http のみになる（切り替えの直後は要注意）
+- 証明書の発行は待てば済む。DNS と CAA が正しければ数分〜1時間ほど。
+  `dig`（CNAME・A・CAA）と `openssl s_client` で切り分けられる
+  （発行前は `*.github.io` の既定証明書が返ってくる）
+
+**次回への注意:**
+
+- 授業で配る URL は https://js-code-runner.fishbone.jp/ 。CLAUDE.md 本文もこれに合わせてある
+- **`Web/` の文言を足すときは学生の目線で書く**（本文の「実行方法」に方針を書いた）
+- ワークフローの実行時に「Node.js 20 is deprecated」という警告が出る（エラーではない）。
+  `actions/checkout` などが新しい版を出したら上げると消える
 
 ### 2026-08-20（2）
 
