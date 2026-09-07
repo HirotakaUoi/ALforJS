@@ -6,7 +6,7 @@
 //
 // readline.Interface はこのファイルで1つだけ作り、非同期イテレータで1行ずつ受け取る。
 // 呼び出しごとに作り直すと、複数行を一度にパイプしたとき2行目以降が読めなくなる。
-const readline = require('readline');
+import readline from 'node:readline';
 const rl = readline.createInterface({ input: process.stdin, terminal: false });
 const _lines = rl[Symbol.asyncIterator]();
 
@@ -24,9 +24,9 @@ function close() {
     rl.close();
 }
 
-// 読み込むだけで output / input が使えるように、グローバルへ登録する。
-// これで各プログラムの共通部分は require("./io.js"); の1行で済み、
-// ブラウザの実行環境（output / input がグローバルにある）と同じ書き方になる。
+// output / input / close を書き出す。各プログラムの共通部分は
+// import { output, input, close } from "./io.js"; の1行で済む。
+// ブラウザの実行環境にも同じ名前の3つがあるので、書き方は両環境で同じになる。
 // 時間計測は Node にもブラウザにもある performance.now() をそのまま使うので、
 // ここでは用意しない
-Object.assign(globalThis, { output, input, close });
+export { output, input, close };

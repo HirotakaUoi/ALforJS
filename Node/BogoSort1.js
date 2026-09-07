@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-require("./io.js");
+import { output, input, close } from "./io.js";
 // ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }

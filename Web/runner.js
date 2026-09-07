@@ -47,7 +47,7 @@ const LIB_TEXT = (() => {
     const inp = pickFunction(src, 'myInput');
     const head = [
         '// この3つは実行環境が用意します。プログラム側で書く必要はありません。',
-        '// スライドのソースにある require("./io.js"); と同じ役割です。',
+        '// スライドのソースにある import { output, input, close } from "./io.js"; と同じ役割です。',
         '// 下がその中身で、output / input / close という名前で使えます。',
         '',
         '',
@@ -72,9 +72,22 @@ function normalizeSource(src) {
         if (end > 0) for (let i = 0; i <= end; i++) lines[i] = '';
     }
     for (let i = 0; i < lines.length; i++) {
-        // 2. require( を含む行（Node専用）
+        // 2. import 行（入出力はこの環境が用意するので読み込む必要がない）。
+        //    上の共通ブロックごと貼らなくても、この1行だけを貼っても消えるようにしてある。
+        //    { } を複数行に分けて書くこともできるので、対応が閉じるまで消す
+        if (/^\s*import\b/.test(lines[i])) {
+            let depth = 0;
+            do {
+                depth += (lines[i].match(/\{/g) || []).length;
+                depth -= (lines[i].match(/\}/g) || []).length;
+                lines[i] = '';
+                if (depth > 0) i++;
+            } while (depth > 0 && i < lines.length);
+            continue;
+        }
+        // 3. require( を含む行（古い書き方のNode版を貼ったとき用）
         if (/\brequire\s*\(/.test(lines[i])) lines[i] = '';
-        // 3. main() を呼び出しているだけの行（実行はこの環境が行う）
+        // 4. main() を呼び出しているだけの行（実行はこの環境が行う）
         if (/^\s*(if\s*\(\s*isNode\s*\)\s*)?main\s*\(\s*\)\s*(\.\s*\w+\s*\([^)]*\))?\s*;/.test(lines[i])) lines[i] = '';
     }
     return lines.join('\n');
@@ -581,7 +594,7 @@ codeEl.addEventListener('input', () => {
 
 const SAMPLE = [
     '// ====== 共通の入出力機能（変更しない）======',
-    'require("./io.js");',
+    'import { output, input, close } from "./io.js";',
     '// ==========================================',
     '',
     'async function main() {',

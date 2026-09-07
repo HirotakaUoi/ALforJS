@@ -15,11 +15,16 @@
 
 - `C++/` — 元の C++ ソース（参考用。**手を入れない**）
 - `Node/` — **標準版**。全45本＋共通ライブラリ。VSCode で動かすメイン環境
-  - `io.js` — 共通の入出力ライブラリ。`output` / `input` / `close` を `globalThis` に登録するので、
-    各プログラムは `require("./io.js");` の1行だけで済む
+  - `io.js` — 共通の入出力ライブラリ。`output` / `input` / `close` を `export` するので、
+    各プログラムは `import { output, input, close } from "./io.js";` の1行だけで済む
+  - `package.json` — `{ "type": "module" }` の1行だけ。これで拡張子は `.js` のまま
+    ES モジュールとして扱われる（`.mjs` に変える必要も、Node の版に頼る必要もない）
+    - **学生には存在も必要性も知らせない**。スライドにも Web/ の画面にも出さない。
+      Node 22.7 / 20.19 以上なら構文判定が働くので、無くても動く（実測で確認済み）。
+      置いてあるのは古い Node への保険であって、学生が意識する必要はないため
   - `文字列アルゴリズム/` — BoyerMoore / BruteForceMatching / KMPMatching
-    - 同フォルダの `io.js` は `../io.js` への中継。これで共通ブロックが45本すべて同一になる
-  - `globals.d.ts` — エディタの補完用（実行には関与しない）
+    - 同フォルダの `io.js` は `../io.js` を再 export する中継。これで共通ブロックが45本すべて同一になる
+    - `package.json` は上の階層のものが効くので、このフォルダには置かなくてよい
 - `Web/` — ブラウザ実行環境。`Node/` のソースを貼り付けて動かす
   - `html.html` — **HTML版**。テキスト入出力のみ。外部ライブラリ不要でオフラインでも動く
   - `p5.html` — **p5.js版**。HTML版＋描画キャンバス
@@ -32,7 +37,7 @@
 
 ```js
 // ====== 共通の入出力機能（変更しない）======
-require("./io.js");
+import { output, input, close } from "./io.js";
 // ==========================================
 
 async function main() {
@@ -80,18 +85,89 @@ main().finally(close);
 - **Node**: `node Node/<ファイル名>.js` — 対話入力・パイプ入力（`echo "5" | node ...`）両方可
 - **ブラウザ**: https://js-code-runner.fishbone.jp/ を開く（GitHub Pages。**授業で配るのはこの URL**）。
   手元のファイルなら `Web/index.html` をダブルクリック → HTML版 / p5.js版 を選ぶ（サーバー不要）
-  - `Node/` のソースを**まるごと**コード欄に貼れば動く。`require` 行と末尾の `main()` 呼び出しは
-    実行環境が自動で取り除く
+  - `Node/` のソースを**まるごと**コード欄に貼れば動く。`import` 行と末尾の `main()` 呼び出しは
+    実行環境が自動で取り除く。共通ブロックのコメント行（`// =====`）を外して `import` の1行だけ
+    貼っても動く（古い `require` 版もそのまま受け付ける）
   - 実行 = Ctrl/Cmd + Enter、中止 = Esc。書いたコードは `localStorage` に自動保存
   - キャンバスは既定で非表示。`createCanvas()` が呼ばれると自動で開く（実行1回につき1度だけ）。
     枠（400px）より大きいキャンバスは縦横比を保ったまま縮めて全体を表示する
   - p5.js の URL は 2系・1系の2つを「設定」から変更可（アクセント色も同じ画面。
     オフライン用にローカルパスも指定できる）。`preload()` を使うスケッチは自動で1系に切り替わる
-  - **`Web/` の画面に出る文言は学生が読む**。`Node/` `Node版` `Web/io.js` `45本` のような
+  - **`Web/` の画面に出る文言は学生が読む**。`Node/` `Node版` `Web/io.js` `45本` `package.json` のような
     リポジトリの構成を知らないと分からない語は使わない（プログラムの出どころは「スライド」と呼ぶ）
 
 ---
 ## 作業引き継ぎログ
+
+### 2026-09-07
+
+**やったこと（`require` をやめて ES モジュールにした）:**
+
+きっかけは「JS の標準機能で教えたいので `require` は使いたくない」という方針。
+`require` は Node 独自の方言で、言語標準は `import`。
+
+1. **`Node/package.json` に `{ "type": "module" }` を置いた**
+   - これが要。拡張子を `.mjs` に変えずに済み、**Node の版にも依存しない**
+     （`package.json` を置かず `.js` のまま `import` と書くやり方もあるが、それは Node が中身を見て
+     判定する新しい挙動に頼るので、古い環境で `Cannot use import statement outside a module` になる）
+   - サブフォルダ `文字列アルゴリズム/` は上の階層の `package.json` を見に行くので追加不要
+2. **共通ブロックを名前つき import にした**（45本すべて同一のまま）
+   - `import { output, input, close } from "./io.js";`
+   - 副作用 import（`import "./io.js";` ＋ `globalThis` 登録）も検証して動いたが、
+     `output` がどこから来たのかコードに現れる名前つきのほうを選んだ
+   - `io.js` は `Object.assign(globalThis, ...)` → `export { output, input, close };`、
+     `require('readline')` → `import readline from 'node:readline';`
+   - `文字列アルゴリズム/io.js` は `export { output, input, close } from "../io.js";` に
+   - **`Node/globals.d.ts` は削除**。import で型が辿れるので不要になった
+3. **WebRunner が `import` 行を取り除くようにした**（`Web/runner.js` の `normalizeSource`）
+   - 従来は `require(` を含む行しか消していなかった。`import` を素通りさせると
+     iframe の中は普通の `<script>` なので文法エラーになる
+   - **コメント行（`// =====`）がなくても消える**ようにした。従来は「先頭の共通ブロックを丸ごと空行に」
+     という別の規則が結果的に消していただけで、`import` の1行だけ貼ると壊れる状態だった
+   - `{ }` を複数行に分けて書いた import も、対応が閉じるまで消す
+   - `require` の規則は残してある（古いソースを貼っても動くように）
+   - あわせて `runner.js` の説明文・既定サンプル、`Web/index.html` の文言も import に直した
+
+**検証:**
+
+- **Node**: 45本を変更前後で実行して比較 — 39本が出力完全一致、**失敗0本**、
+  残り6本（BigSearch1 / BigSort2 / BitonicSort2 / BogoSort1 / BubbleSort2 / QuickSort3）は
+  乱数・時間依存でこれまでの検証と同じ顔ぶれ
+- ESM は常に strict モードになるので暗黙のグローバル変数などを心配したが、45本とも無傷
+- 対話実行（標準入力を開いたまま）でも `close()` が効いて正常終了することを確認
+- **ブラウザ**: `http://localhost:8765/Web/html.html` で6パターンとも `Found: 8 at index 3` を確認
+  — ①共通ブロックあり ②import 1行だけ ③副作用 import ④複数行 import ⑤旧 require 版 ⑥何もなし
+- 動作ハイライトも確認。行番号がずれないこと（消した行は空行にするため）を実画面で確認
+
+**技術的に確定したこと（再調査不要）:**
+
+- **`import` は「実行される命令」ではなく宣言**なので、書いた位置に関係なく本体より先に走る
+  （実測: `console.log("1行目"); import "./noisy.mjs";` は `[lib]` → `1行目` の順に出る）。
+  「上から順に実行される」の唯一の例外として授業で使える
+- **CommonJS ではトップレベル `await` が使えない**。Node のエラーが
+  「wrap await in an async function」と直接言う。これが `async function main()` が必要な本当の理由
+- **トップレベル `return` は CJS では通るが ESM では `SyntaxError`**（Node が CJS を関数で包むため）。
+  トップレベルの `this` も CJS は `{}`、ESM は `undefined`
+- **`close()` は入力を使わない24本にも要る**。`io.js` を読み込んだ時点で readline が
+  標準入力を開くため。パイプ実行では EOF が来るので症状が出ず、**ターミナルから手で動かしたときだけ
+  終わらなくなる**（実測で確認）
+- ESM から CommonJS を `import` するのも、CJS から ESM を `require` するのも、今の Node なら両方可
+
+**方針として決めたこと:**
+
+- **`package.json` の存在も必要性も学生には知らせない**（`Web/` の画面にもスライドにも出さない）。
+  Node 22.7 / 20.19 以上なら構文判定が働くので無くても動く（実測で確認）。置いてあるのは
+  古い Node への保険にすぎず、学生が意識する必要はないため。学生向け文言の禁止語にも追加した
+- 対象は1年生で、Node が古い可能性は低いという判断。それでもファイル1つで数世代ぶんの
+  保険になるので `package.json` は残す
+
+**次回への注意:**
+
+- 授業で `require` と `import` の違いに触れるなら、上の「確定したこと」がそのまま使える
+- **スライドのソースを差し替える必要がある**（共通ブロックの2行目が変わった）。未着手
+- 古い Node での実測はできていない（この環境は v26.7.0 のみ）。版の下限は Node 公式ドキュメント
+  による。`performance` グローバルが 16.0.0、`node:` 接頭辞が import では 14.13.1、
+  構文判定が 22.7.0 / 20.19.0
 
 ### 2026-08-21
 
