@@ -96,7 +96,7 @@ function bsearch1(s, d) {
 }
 
 async function main() {
-  const arraySize = parseInt(await input("Input array size: "), 10);
+  const arraySize = parseInt(await input("Input array size: "));
   const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
   const N = arraySize;
   for (let i = 0; i < N; i++) {
@@ -108,7 +108,7 @@ async function main() {
   }
   output("\n");
 
-  const d = parseInt(await input("Input search number: "), 10);
+  const d = parseInt(await input("Input search number: "));
 
   search1(s, d);
   bsearch1(s, d);

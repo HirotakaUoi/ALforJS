@@ -23,7 +23,7 @@ function bsearch(dst, first, last, s, step) {
 async function main() {
     const s = [0, 1, 2, 4, 5, 7, 8, 9];
     const N = s.length;
-    const d = parseInt(await input("Input search number: "), 10);
+    const d = parseInt(await input("Input search number: "));
 
     const res = bsearch(d, 0, N - 1, s, 0);
     if (res === -1) {

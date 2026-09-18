@@ -2,18 +2,10 @@
 import { output, input, close } from "./io.js";
 // ==========================================
 
-function fact(n) {
-    if (n === 1) {
-        return 1;
-    } else {
-        return n * fact(n - 1);
-    }
-}
-
 async function main() {
-    const n = parseInt(await input("Input number: "));
-
-    output(fact(n) + "\n");
+    for (let i = 0; true; i++) {
+        output(i + ":\tこんにちは！ 魚井!\n");
+    }
 }
 
 main().finally(close);

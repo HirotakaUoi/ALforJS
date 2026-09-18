@@ -269,7 +269,7 @@ function combSort(s) {
 }
 
 async function main() {
-    const arraySize = parseInt(await input("Input array size: "), 10);
+    const arraySize = parseInt(await input("Input array size: "));
     const s = [];
     const t = [];
     const u = [];

@@ -31,7 +31,7 @@ function bitonicSort(s, N) {
 }
 
 async function main() {
-    const logArraySize = parseInt(await input("Input array size by 2^N: "), 10);
+    const logArraySize = parseInt(await input("Input array size by 2^N: "));
     // ( n<<N は nのN bit左シフト == n*(2^N))
     const s = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     const N = logArraySize;

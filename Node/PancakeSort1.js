@@ -55,9 +55,6 @@ async function main() {
         output(s[k] + " ");
     }
     output("\n");
-
-    const t = [0, 1, 2, 3, 4, 5, 6];
-    for (let t = 0; t < 7; t++) return;
 }
 
 main().finally(close);

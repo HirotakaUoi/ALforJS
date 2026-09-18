@@ -13,7 +13,7 @@ function fact(n) {
 
 
 async function main() {
-    const n = parseInt(await input("Input number: "), 10);
+    const n = parseInt(await input("Input number: "));
 
     output(fact(n) + "\n");
 }

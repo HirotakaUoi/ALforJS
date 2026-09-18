@@ -53,7 +53,4 @@ int main(void) {
         cout << s[k] << " ";
     }
     cout << "\n";
-
-    int t[] = {0, 1, 2, 3, 4, 5, 6};
-    for (int t = 0; t < 7; t++) return 0;
 }

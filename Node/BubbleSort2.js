@@ -19,7 +19,7 @@ function bubbleSort(s) {
 }
 
 async function main() {
-  const arraySize = parseInt(await input("Input array size: "), 10);
+  const arraySize = parseInt(await input("Input array size: "));
   const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
   const N = arraySize;
   for (let i = 0; i < N; i++) {

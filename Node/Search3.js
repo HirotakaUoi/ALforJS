@@ -8,7 +8,7 @@ async function main() {
     const N = s.length;
     let i;
 
-    const d = parseInt(await input("Input search number: "), 10);
+    const d = parseInt(await input("Input search number: "));
 
     for (i = 0; i < N; i++) {
         if (d <= s[i])
