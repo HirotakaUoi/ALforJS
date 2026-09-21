@@ -10,14 +10,10 @@ function partition(arr, first, last) {
     for (let j = first; j < last; ++j) {
         if (arr[j] <= pivot) {
             ++i;
-            const temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
     }
-    const temp = arr[i + 1];
-    arr[i + 1] = arr[last];
-    arr[last] = temp;
+    [arr[i + 1], arr[last]] = [arr[last], arr[i + 1]];
     const pivotIndex = i + 1;
 
     // 分割結果を表示（ピボットを一度だけ表示）

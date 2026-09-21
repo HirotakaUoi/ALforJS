@@ -5,9 +5,7 @@ import { output, input } from "./io.js";
 function rand() { return Math.floor(Math.random() * 2147483648); }
 
 function swap(s, i, j) {
-    const temp = s[i];
-    s[i] = s[j];
-    s[j] = temp;
+    [s[i], s[j]] = [s[j], s[i]];
 }
 
 function bitonicSort(s, N) {

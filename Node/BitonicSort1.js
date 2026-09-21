@@ -3,9 +3,7 @@ import { output, input } from "./io.js";
 // ==========================================
 
 function swap(s, i, j) {
-    const temp = s[i];
-    s[i] = s[j];
-    s[j] = temp;
+    [s[i], s[j]] = [s[j], s[i]];
 }
 
 function bitonicSort(s, N) {
@@ -15,9 +13,8 @@ function bitonicSort(s, N) {
             for (let i = 0; i < (1 << N); i++) {
                 if ((((i >> fb) & 1) ^ ((i >> sb) & 1)) && (s[i] < s[i ^ (1 << sb)])) {
                     //                  swap(s, i, i^(1<<sb));
-                    const temp = s[i];
-                    s[i] = s[i ^ (1 << sb)];
-                    s[i ^ (1 << sb)] = temp;
+                    const j = i ^ (1 << sb);
+                    [s[i], s[j]] = [s[j], s[i]];
                 }
             }
         }

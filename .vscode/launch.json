@@ -8,8 +8,11 @@
             "name": "現在のファイルをデバッグ",
             "program": "${file}",
             "console": "integratedTerminal",  // input() をターミナルで受け取るため
+                                              // （デバッグコンソールには標準入力が無く、
+                                              //   input() が空文字を返して NaN になる）
             "skipFiles": [
-                "<node_internals>/**"         // Node 内部（readline など）には入らない
+                "<node_internals>/**",            // Node 内部には入らない
+                "${workspaceFolder}/Node/io.js"   // 共通の入出力機能にも入らない
             ]
         }
     ]

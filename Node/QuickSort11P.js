@@ -31,7 +31,7 @@ import { output, input } from "./io.js";
 
 // クイックソート（マルチスレッド版：JavaScriptでは非同期タスクで並行実行を再現）
 async function parallelQuickSort(s, first, last) {
-    let i, j, pivot, temp;
+    let i, j, pivot;
 
     if (first < last) {
         pivot = s[last];
@@ -47,15 +47,11 @@ async function parallelQuickSort(s, first, last) {
             if (i >= j) {
                 break;
             }
-            temp = s[i];
-            s[i] = s[j];
-            s[j] = temp;
+            [s[i], s[j]] = [s[j], s[i]];
             i += 1;
             j -= 1;
         }
-        temp = s[i];
-        s[i] = s[last];
-        s[last] = temp;
+        [s[i], s[last]] = [s[last], s[i]];
         // 分割結果を表示（ピボットを一度だけ表示）
         for (let k = first; k <= last; ++k) {
             if (k === i) {

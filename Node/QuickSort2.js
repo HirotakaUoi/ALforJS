@@ -5,7 +5,7 @@ import { output, input } from "./io.js";
 function rand() { return Math.floor(Math.random() * 2147483648); }
 
 function qsort(s, first, last) {
-    let pivot, i, j, temp, piv, mid;
+    let pivot, i, j, piv, mid;
 
     for (let k = first; k <= last; k++) {
         output(s[k] + " ");
@@ -30,9 +30,7 @@ function qsort(s, first, last) {
             } else {
                 piv = last;
             }
-            temp = s[piv];
-            s[piv] = s[last];
-            s[last] = temp;
+            [s[piv], s[last]] = [s[last], s[piv]];
         }
         pivot = s[last];
         //          output("Pivot=" + pivot + "\n");
@@ -49,15 +47,11 @@ function qsort(s, first, last) {
             if (i >= j) {
                 break;
             }
-            temp = s[i];
-            s[i] = s[j];
-            s[j] = temp;
+            [s[i], s[j]] = [s[j], s[i]];
             i += 1;
             j -= 1;
         }
-        temp = s[i];
-        s[i] = s[last];
-        s[last] = temp;
+        [s[i], s[last]] = [s[last], s[i]];
 
         for (let k = first; k < i; k++) {
             output(s[k] + " ");

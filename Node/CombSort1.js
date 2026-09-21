@@ -4,7 +4,6 @@ import { output, input } from "./io.js";
 
 function combSort(s) {
     const N = s.length;
-    let temp;
     let h = Math.floor(N * 10 / 13);
     let swapped;
 
@@ -13,9 +12,7 @@ function combSort(s) {
         swapped = false;
         for (let i = 0; i + h < N; i++) {
             if (s[i] > s[i + h]) {
-                temp = s[i + h];
-                s[i + h] = s[i];
-                s[i] = temp;
+                [s[i + h], s[i]] = [s[i], s[i + h]];
                 swapped = true;
             }
         }

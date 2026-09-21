@@ -6,13 +6,11 @@ function rand() { return Math.floor(Math.random() * 2147483648); }
 
 function shuffle(s) {
     const N = s.length;
-    let k, temp;
+    let k;
 
     for (let i = N - 1; i > 0; --i) {
         k = rand() % (i + 1);
-        temp = s[i];
-        s[i] = s[k];
-        s[k] = temp;
+        [s[i], s[k]] = [s[k], s[i]];
     }
 }
 

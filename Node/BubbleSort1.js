@@ -12,10 +12,9 @@ function bubbleSort(s) {
     output("\n");
     for (let j = 0; j < N - 1; j++)
       if (s[j] > s[j + 1]) {
-        [s[j], s[j + 1]] = [s[j + 1], s[j]];
-        // temp = s[j];
-        // s[j] = s[j + 1];
-        // s[j + 1] = temp;
+        temp = s[j];
+        s[j] = s[j + 1];
+        s[j + 1] = temp;
       }
   }
 }

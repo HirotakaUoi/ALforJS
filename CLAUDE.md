@@ -82,6 +82,11 @@ main();
   - 例外2: `Search2` は番兵を使う。配列にダミーを置かず、`const N = s.length;` で大きさを取ってから
     `s[N] = d;` で番兵を追加する（JS の配列は自動で伸びるのでダミーは要らない）
   - 授業では「C++ ではサイズを別に渡す必要があるが、JS は配列が長さを知っている」と対比できる
+- **交換（スワップ）の書き方は MergeSort を境に変える**（スライドの構成に合わせてある）
+  - MergeSort より前は `temp` を使う3行。交換そのものを教える場面なので C++ と対応させる
+  - MergeSort 以降は分割代入 `[s[i], s[j]] = [s[j], s[i]];` の1行
+  - 例外: `BitonicSort1` は添字が長く1行が72桁になるので、
+    `const j = i ^ (1 << sb);` を挟んで2行にする（スライドの枠に収まらないため）
 - C++ の整数除算は `Math.floor()` で再現
 - C++ の `rand()` は JS に無いので、使う10本すべてに**同一の1行**を置く（共通ブロックの直後）
   ```js
@@ -114,6 +119,93 @@ main();
 
 ---
 ## 作業引き継ぎログ
+
+### 2026-09-21（3）
+
+**やったこと（スライドの JS 化と、Google スライドへの移行の準備）:**
+
+1. **交換の書き方を MergeSort を境に分けた**（スライドの構成に合わせ、`Node/` も揃えた）
+   - **MergeSort より前** … `temp` 方式のまま（BubbleSort1・BubbleSort2・SelectionSort1・
+     InsertionSort1・ShellSort1・BigSort1・BigSort2・BigSearch1）
+   - **MergeSort 以降** … 分割代入 `[s[i], s[j]] = [s[j], s[i]];`（HeapSort1・QuickSort1/2/3・
+     QuickSort1P/11P・BitonicSort0/1/2・BogoSort1・CombSort1・GnomeSort1・PancakeSort1・StoogeSort1）
+   - `BubbleSort1` の「一時的」な分割代入は **temp に戻した**（MergeSort より前のため）。
+     使われなくなった `let temp;` も宣言から外した
+   - 検証: 46本を変更前後で実行し38本が出力完全一致、残る8本は乱数依存
+2. **`BitonicSort1` の1行を2行に分けた**
+   - `[s[i], s[i ^ (1 << sb)]] = [s[i ^ (1 << sb)], s[i]];` は **72桁**になり、
+     スライドの枠（9.29インチ・19.75pt）に収まらなかった
+   - `const j = i ^ (1 << sb);` を挟んで2行にした。出力は変更前と完全一致
+3. **`BigSort2` の時間表示から実装名を外した** — `μs unit (performance.now)` → **`μs unit`**
+   - C++ は `1/1000000sec unit`（`CLOCKS_PER_SEC` から作る）。中身は同じで、
+     出力に関数名が漏れていたのを直した。`Node/` で出力に実装名が出る箇所はこれで0
+4. **`.vscode/launch.json` を現状に合わせた**
+   - `skipFiles` に `${workspaceFolder}/Node/io.js` を追加（`input()` で F11 を押しても
+     共通ライブラリに入り込まない）
+   - `readline` に触れた古いコメントを削除し、`console` 指定が要る理由を書いた
+
+**スライド（pptx・git 管理外）にやったこと:**
+
+`アルゴリズム基礎論 2026X.pptx`（339枚）に対して、
+
+- **JS 化の置換 104箇所**（`import` の1行・`async function main`・`await input(`・
+  `main().finally(close);`・`parseInt(…, 10)`）＋ **交換13箇所**（221枚目以降）＋ **説明文7箇所**
+  - 説明文は `await` / `close` が無くなって**事実と合わなくなった記述**を直した
+    （72枚目「await を必ず付ける」→「入力が終わるまで次の行へ進まない」など）
+- **共通ブロックのコメント行を64枚目だけ外した**。35枚目は最初の解説なので残す
+- **TIFF 3つを PNG に変換**（`image9.tiff` は 4.1MB → 260KB）。参照 6件を張り替え、
+  **Google スライドで画像が出ない**問題に対応した
+- バックアップ `アルゴリズム基礎論 2026X.差し替え前バックアップ.pptx` を同じフォルダに置いた
+
+**Google スライド移行の準備:**
+
+- **`tools/slide-map.md`** — C++版（2026W・275枚）と JS版（2026X・339枚）の全対応表。
+  見出しで突き合わせたので番号がずれていても追える
+  - 対象は「おわり」まで（C++ 1–259 / JS 1–323）。それ以降16枚は両版とも同じ予備スライドで対象外
+  - **同一150 / コード書換75 / 文言差34 / 追加64 / 削除0**
+  - 追加64枚のかたまり: JS 2 ／ 29–43（JavaScript の紹介）／ 50 ／ 58 ／ **62–107（JavaScript入門2回分）**
+- **`tools/gslides-merge.gs`** — 139件（差替75＋挿入64）の操作表を埋め込んだ Apps Script。
+  `plan()` で確認 → `apply()` で実行。6分で止まっても続きから再開できる
+- **`tools/gslides-inventory.gs`** — デッキの中身を書き出す下調べ用（読むだけ）
+
+**技術的に確定したこと（再調査不要）:**
+
+- **Google スライドが扱えない pptx の中身**: EMF・TIFF・インク注釈・OLE埋め込み・グラフ。
+  取り込み時に画像が作られないので、**どのブラウザで開いても出ない**
+  - この pptx では11枚が該当。うち**コピー対象139枚に入るのは2枚だけ**（JS43=TIFF・JS154=インク）
+  - TIFF は `magick` で PNG に変換できる。**EMF は変換できない**（delegate が無い）。
+    EMF 4枚はいずれもコピー対象外なので今回は放置
+- **Slides API は `fields` を指定しないと重い**。拡張サービスの `Slides.Presentations.get(id)` は
+  `fields` を渡せず、マスター・レイアウト・全図形の座標まで返すので300枚規模では実用にならない。
+  `UrlFetchApp` で `slides(pageElements(shape(text(textElements(textRun(content))))…))` に絞ること
+  - `UrlFetchApp` で叩くと、スクリプトのプロジェクトで Slides API を有効にする必要がある
+    （エディタ左の「サービス」→ ＋ → Slides API で済む）
+- **`insertSlide(位置, 別デッキのスライド)` は書式ごと複製できる**。デッキ間のコピーはこれが使える。
+  **後ろから処理すれば、まだ触っていない位置の番号はずれない**（139件を机上で検証済み）
+- **VS Code のデバッグコンソールには標準入力が無い**。`input()` が空文字を返し `parseInt("")` が
+  `NaN` になるが**エラーは出ない**（実測: `I can't find: NaN`）。`"console": "integratedTerminal"` が必須
+- **Safari で Google スライドの画像が出ないことがある**。形式の問題ではなく機能拡張が原因
+  （プライベートウインドウでは表示された）。この Mac にコンテンツブロッカーは無く、
+  Parallels Toolbox の Download Video / Instapaper などが疑わしい。**Chrome なら問題なし**
+
+**次回への注意:**
+
+- **pptx に C++ の痕跡が残っている**（GS へ取り込む前に直すと二度手間にならない）
+  - 304枚目 `clock() で…マイクロ秒数が得られます` → `performance.now()` へ
+  - 61・78枚目 `Hello.cpp` ／ 117枚目 `Search1.cpp`
+  - 21枚目 `#include` `using namespace std;` ／ 25枚目 `cout <<` ／ 27枚目 C++ の for 文
+  - 18〜21枚目の見出しが「C++の変数」「C++のリテラル」など。**意図的な対比か消し忘れか未確認**
+    （JS版では 29–43枚目に JavaScript 版の説明が別途入っている）
+  - 305枚目の `output("μs unit (performance.now)\n")` → `output("μs unit\n")`（ユーザーが対応予定）
+- **Google スライドへの取り込みは未実施**。手順は `tools/gslides-merge.gs` の冒頭にある
+  - pptx と C++版デッキが**同じ名前になる**ので、変換したほうを改名すること
+  - **まず C++版を複製して試すこと**（本番をいきなり書き換えない）
+- **「文言差34枚」を差し替えに含めるかは未決**。単純な置換では済まないもの
+  （`Hello.cpp`→`Hello.js` のような置換と、行の増減を伴うものが混在）があるため、
+  **差し替え対象に加えて173件にするほうが単純**という提案を出したところ
+- **インク注釈（JS154）は無視する方針**。差し替えるとペン書き込みは失われる
+- `Node/.vscode/launch.json` が VS Code に自動生成された（既定のひな形で `integratedTerminal` 無し）。
+  ルートの `.vscode/launch.json` が正なので、**コミットしていない**。消すか `.gitignore` に入れるか未決
 
 ### 2026-09-21（2）
 

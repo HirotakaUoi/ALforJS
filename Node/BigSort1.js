@@ -146,9 +146,9 @@ function main() {
     // //   }
     // //   output("\n");
 
-    output("BubbleSort Start!!\n");
-    bubbleSort(s);
-    output("BubbleSort End!!\n");
+    // output("BubbleSort Start!!\n");
+    // bubbleSort(s);
+    // output("BubbleSort End!!\n");
     // for (let k=0; k<N-1; k++) {
     //  output(s[k] + " ");
     // }

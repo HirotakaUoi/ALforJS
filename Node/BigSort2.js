@@ -237,7 +237,8 @@ function qsort(s, first, last) {
 }
 
 function quickSort(s) {
-    const N = s.length; qsort(s, 0, N - 1); }
+    const N = s.length; qsort(s, 0, N - 1);
+}
 
 function combSort(s) {
     const N = s.length;
@@ -289,7 +290,7 @@ function main() {
     //  }
     //  output("\n");
 
-    output("μs unit (performance.now)\n");
+    output("μs unit\n");
 
     let startTime = Math.round(performance.now() * 1000);
     output("QuickSort Start:  " + startTime + "\n");

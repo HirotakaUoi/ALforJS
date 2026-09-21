@@ -14,9 +14,7 @@ function gnomeSort(s) {
         if (i === 0 || s[i - 1] <= s[i]) {
             i++;
         } else {
-            const temp = s[i];
-            s[i] = s[i - 1];
-            s[i - 1] = temp;
+            [s[i], s[i - 1]] = [s[i - 1], s[i]];
             i--;
         }
     }

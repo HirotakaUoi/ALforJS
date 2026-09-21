@@ -5,9 +5,7 @@ import { output, input } from "./io.js";
 // リストの前からk+1個の要素を反転する関数
 function flip(s, k) {
     for (let i = 0; i <= Math.floor(k / 2); i++) {
-        const temp = s[i];
-        s[i] = s[k - i];
-        s[k - i] = temp;
+        [s[i], s[k - i]] = [s[k - i], s[i]];
     }
 }
 
