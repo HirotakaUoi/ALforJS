@@ -19,15 +19,15 @@ function bucketSort(s) {
 
     i = 0;
     for (j = 0; j <= max; j++)
-    while (b[j] > 0) {
-        s[i++] = j;
-        b[j] -= 1;
-    }
+        while (b[j] > 0) {
+            s[i++] = j;
+            b[j] -= 1;
+        }
 }
 
 async function main() {
-// const s = [4, 3, 1, 6, 5, 4, 2, 3, 0];   // max=6
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0];
+    // const s = [4, 3, 1, 6, 5, 4, 2, 3, 0];   // max=6
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0];
     const s = [4, 15, 2, 7, 10, 8, 1, 20, 14, 9, 3, 0, 12, 0, 2, 10];
     const N = s.length;
 

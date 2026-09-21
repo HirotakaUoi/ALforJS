@@ -2,13 +2,7 @@
 import { output, input, close } from "./io.js";
 // ==========================================
 
-// C言語の srand()/rand() 相当（シード付き線形合同法）
-let _seed = 1;
-function srand(seed) { _seed = seed >>> 0; }
-function rand() {
-    _seed = (Math.imul(_seed, 1103515245) + 12345) >>> 0;
-    return (_seed >>> 16) & 0x7fff;
-}
+function rand() { return Math.floor(Math.random() * 2147483648); }
 
 function swap(s, i, j) {
     const temp = s[i];
@@ -30,7 +24,6 @@ function bitonicsort(lgn, ary) {
 }
 
 async function main() {
-    srand(10000);
     const lgn = 10;
     const ary = [];     // JSの配列は自動拡張されるため大きさの指定は不要
     output(String(1 << lgn));

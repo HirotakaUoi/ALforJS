@@ -2,16 +2,16 @@
 import { output, input, close } from "./io.js";
 // ==========================================
 
-function bsearch(dst, first, last, s, step) {
+function bsearch(dst, first, last, s) {
     if (first > last) return -1;
     const center = Math.floor((first + last) / 2);
 
     if (dst === s[center]) {
         return center;
     } else if (dst < s[center]) {
-        return bsearch(dst, first, center - 1, s, step + 1);
+        return bsearch(dst, first, center - 1, s);
     } else {
-        return bsearch(dst, center + 1, last, s, step + 1);
+        return bsearch(dst, center + 1, last, s);
     }
 }
 
@@ -20,7 +20,7 @@ async function main() {
     const N = s.length;
     const d = parseInt(await input("Input search number: "));
 
-    const res = bsearch(d, 0, N - 1, s, 0);
+    const res = bsearch(d, 0, N - 1, s);
     if (res === -1) {
         output("I can't find: " + d + "\n");
     } else {

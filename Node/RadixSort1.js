@@ -2,6 +2,8 @@
 import { output, input, close } from "./io.js";
 // ==========================================
 
+function rand() { return Math.floor(Math.random() * 2147483648); }
+
 function radixSort(s, max) {
     const N = s.length;
     let i, j, k, n;
@@ -10,7 +12,7 @@ function radixSort(s, max) {
     const b = [[], [], [], [], [], [], [], [], [], []];
 
     for (n = 1; n < max; n *= 10) {
-        for (i = 0; i < 10; i++) b[i].length = 0;
+        for (i = 0; i < 10; i++) b[i] = [];
 
         for (i = 0; i < N; i++)
             b[Math.floor(s[i] / n) % 10].push(s[i]);
@@ -33,13 +35,13 @@ function radixSort(s, max) {
 }
 
 async function main() {
-    const s = [345, 98, 302, 719, 804, 620, 183, 431, 572];
-    const N = s.length;
-// const s = new Array(20);
-// const N = 20;
-    // for (let i = 0; i < N; i++) {
-    //     s[i] = (rand() % 1000);
-    // }
+    // const s = [345, 98, 302, 719, 804, 620, 183, 431, 572];
+    // const N = s.length;
+    const s = [];
+    const N = 20;
+    for (let i = 0; i < N; i++) {
+        s[i] = (rand() % 1000);
+    }
     for (let k = 0; k < N; k++) {
         output(s[k] + " ");
     }

@@ -6,11 +6,11 @@ async function main() {
 
     const s = [0, 1, 2, 4, 5, 7, 8, 9];
     const N = s.length;
-    let i;
+    let i = 0;
 
     const d = parseInt(await input("Input search number: "));
 
-    for (i = 0; i < N; i++) {
+    for (; i < N; i++) {
         if (d <= s[i])
             break;
     }

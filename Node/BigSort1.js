@@ -39,10 +39,10 @@ function insertionSort(s) {
     const N = s.length;
     let j, temp;
     for (let i = 0; i < N - 1; i++) {
-//      for (let k=0; k<N; k++) {
-//          output(s[k] + " ");
-//      }
-//      output("\n");
+        //      for (let k=0; k<N; k++) {
+        //          output(s[k] + " ");
+        //      }
+        //      output("\n");
         j = i + 1;
         while ((j > 0) && (s[j - 1] > s[j])) {
             temp = s[j];
@@ -63,11 +63,11 @@ function shellSort(s) {
     h = Math.floor((h - 1) / 3);
 
     while (h > 0) {
-//      output(h + " : ");
-//      for (let x=0; x<N; x++) {
-//          output(s[x] + " ");
-//      }
-//      output("\n");
+        //      output(h + " : ");
+        //      for (let x=0; x<N; x++) {
+        //          output(s[x] + " ");
+        //      }
+        //      output("\n");
         for (i = h; i < N; i++) {
             j = i;
             while ((j >= h) && (s[j - h] > s[j])) {
@@ -84,14 +84,14 @@ function shellSort(s) {
 function qsort(s, first, last) {
     let pivot, i, j, temp;
 
-//      for (let k=first; k<=last; k++) {
-//          output(s[k] + " ");
-//      }
-//      output("first= " + first + " last= " + last + "\n");
+    //      for (let k=first; k<=last; k++) {
+    //          output(s[k] + " ");
+    //      }
+    //      output("first= " + first + " last= " + last + "\n");
 
     if (first < last) {
         pivot = s[last];
-//          output("Pivot=" + pivot + "\n");
+        //          output("Pivot=" + pivot + "\n");
         i = first;
         j = last - 1;
         while (true) {
@@ -101,7 +101,7 @@ function qsort(s, first, last) {
             while ((j >= first) && (s[j] > pivot)) {
                 j -= 1;
             }
-//          output("i= " + i + "j= " + j + "\n");
+            //          output("i= " + i + "j= " + j + "\n");
             if (i >= j) {
                 break;
             }
@@ -115,14 +115,14 @@ function qsort(s, first, last) {
         s[i] = s[last];
         s[last] = temp;
 
-//  for (let k=first; k<i; k++) {
-//      output(s[k] + " ");
-//  }
-//  output(" Pivot=" + s[i] + " ");
-//  for (let k=i+1; k<=last; k++) {
-//      output(s[k] + " ");
-//  }
-//  output("\n");
+        //  for (let k=first; k<i; k++) {
+        //      output(s[k] + " ");
+        //  }
+        //  output(" Pivot=" + s[i] + " ");
+        //  for (let k=i+1; k<=last; k++) {
+        //      output(s[k] + " ");
+        //  }
+        //  output("\n");
 
         qsort(s, first, i - 1);
         qsort(s, i + 1, last);
@@ -138,35 +138,35 @@ async function main() {
     const arraySize = parseInt(await input("Input array size: "));
     const s = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     const N = arraySize;
-    // for (let i = 0; i < N; i++) {
-    //  s[i] = (rand() % 1000000);
-    // }
-// //   for (let k=0; k<N; k++) {
-// //       output(s[k] + " ");
-// //   }
-// //   output("\n");
+    for (let i = 0; i < N; i++) {
+        s[i] = (rand() % 1000000);
+    }
+    // //   for (let k=0; k<N; k++) {
+    // //       output(s[k] + " ");
+    // //   }
+    // //   output("\n");
 
-    // output("BubbleSort Start!!\n");
-    // bubbleSort(s);
-    // output("BubbleSort End!!\n");
+    output("BubbleSort Start!!\n");
+    bubbleSort(s);
+    output("BubbleSort End!!\n");
     // for (let k=0; k<N-1; k++) {
     //  output(s[k] + " ");
     // }
     // output("\n");
-    // for (let i = 0; i < N; i++) {
-    //  s[i] = (rand() % 1000000);
-    // }
-    // output("SelectionSort Start!!\n");
-    // selectionSort(s);
-    // output("SelectionSort End!!\n");
+    for (let i = 0; i < N; i++) {
+        s[i] = (rand() % 1000000);
+    }
+    output("SelectionSort Start!!\n");
+    selectionSort(s);
+    output("SelectionSort End!!\n");
 
-    // for (let i = 0; i < N; i++) {
-    //  // s[i] = (rand() % 1000000);
-    //  s[i] = 1000000-i;
-    // }
-    // output("InsertionSort Start!!\n");
-    // insertionSort(s);
-    // output("InsertionSort End!!\n");
+    for (let i = 0; i < N; i++) {
+        s[i] = (rand() % 1000000);
+        // s[i] = 1000000 - i;
+    }
+    output("InsertionSort Start!!\n");
+    insertionSort(s);
+    output("InsertionSort End!!\n");
 
     for (let i = 0; i < N; i++) {
         // s[i] = (rand() % 1000000);

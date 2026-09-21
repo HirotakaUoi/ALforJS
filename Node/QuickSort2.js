@@ -2,6 +2,8 @@
 import { output, input, close } from "./io.js";
 // ==========================================
 
+function rand() { return Math.floor(Math.random() * 2147483648); }
+
 function qsort(s, first, last) {
     let pivot, i, j, temp, piv, mid;
 

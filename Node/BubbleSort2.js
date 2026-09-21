@@ -2,9 +2,7 @@
 import { output, input, close } from "./io.js";
 // ==========================================
 
-function rand() {
-  return Math.floor(Math.random() * 2147483648);
-}
+function rand() { return Math.floor(Math.random() * 2147483648); }
 
 function bubbleSort(s) {
   const N = s.length;
