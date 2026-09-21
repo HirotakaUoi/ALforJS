@@ -1,3 +1,3 @@
-// 共通の入出力機能は Node/io.js にある。サブフォルダからも
-// import { output, input, close } from "./io.js"; の1行で届くようにするための中継ファイル。
-export { output, input, close } from "../io.js";
+// 上の階層の io.js をそのまま渡すだけの中継。
+// これで共通ブロックの1行が全ファイルで同じになる。
+export { output, input } from "../io.js";

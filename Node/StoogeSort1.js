@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function stoogeSort(s, i, j) {
@@ -17,7 +17,7 @@ function stoogeSort(s, i, j) {
     }
 }
 
-async function main() {
+function main() {
     const s = [5, 4, 8, 2, 7, 0, 1];
     const N = s.length;
 
@@ -34,4 +34,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

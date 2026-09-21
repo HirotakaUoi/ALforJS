@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function bucketSort(s) {
@@ -25,7 +25,7 @@ function bucketSort(s) {
         }
 }
 
-async function main() {
+function main() {
     // const s = [4, 3, 1, 6, 5, 4, 2, 3, 0];   // max=6
     // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0];
     const s = [4, 15, 2, 7, 10, 8, 1, 20, 14, 9, 3, 0, 12, 0, 2, 10];
@@ -39,4 +39,4 @@ async function main() {
     // console.log();
 }
 
-main().finally(close);
+main();

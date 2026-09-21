@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
@@ -23,7 +23,7 @@ function bitonicsort(lgn, ary) {
     }
 }
 
-async function main() {
+function main() {
     const lgn = 10;
     const ary = [];     // JSの配列は自動拡張されるため大きさの指定は不要
     output(String(1 << lgn));
@@ -37,4 +37,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

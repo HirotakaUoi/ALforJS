@@ -46,16 +46,18 @@ const LIB_TEXT = (() => {
     const out = pickFunction(src, 'myOutput');
     const inp = pickFunction(src, 'myInput');
     const head = [
-        '// この3つは実行環境が用意します。プログラム側で書く必要はありません。',
-        '// スライドのソースにある import { output, input, close } from "./io.js"; と同じ役割です。',
-        '// 下がその中身で、output / input / close という名前で使えます。',
+        '// この2つは実行環境が用意します。プログラム側で書く必要はありません。',
+        '// スライドのソースにある import { output, input } from "./io.js"; と同じ役割です。',
+        '// 下がその中身で、output / input という名前で使えます。',
+        '',
+        '// ブラウザはキー入力を同期で待てないので、ここの input は「あとで値が届く」形に',
+        '// なっています。プログラムはスライドのまま書けば動きます（実行環境が調整します）。',
         '',
         '',
     ].join('\n');
     // 切り出せなかったときは io.js 全体を出す（空欄になるよりはよい）
     if (!out || !inp) return head + src;
-    return head + out + '\n\n' + inp
-        + '\n\nwindow.close = function () { };   // 形をそろえるためのもの（何もしません）';
+    return head + out + '\n\n' + inp;
 })();
 document.getElementById('libCode').textContent = LIB_TEXT;
 
@@ -91,6 +93,23 @@ function normalizeSource(src) {
         if (/^\s*(if\s*\(\s*isNode\s*\)\s*)?main\s*\(\s*\)\s*(\.\s*\w+\s*\([^)]*\))?\s*;/.test(lines[i])) lines[i] = '';
     }
     return lines.join('\n');
+}
+
+// ====== 同期の書き方を、この環境で動く形に直す ======
+// ブラウザはキー入力を同期で待てない（単一スレッドなので、待っている間は
+// キーを受け取る処理も動けない）。そこで input は値をあとから返す形になっており、
+// 受け取る側に await が、その関数に async が要る。
+//
+// とはいえ、それをプログラムに書かせるとスライドの見た目が Node と変わってしまう。
+// そこで実行の直前にこの環境が補う。挿すのはどちらも同じ行の中なので、
+// 行数は1行も変わらない（＝コード欄の行番号もハイライトもずれない）。
+function toAsync(src) {
+    return src
+        // function main( → async function main(（すでに async なものはそのまま）
+        .replace(/(^|\n)([ \t]*)function(\s+main\s*\()/g, '$1$2async function$3')
+        // input( → await input(（すでに await が付いているもの、
+        // obj.input( のような別物、function input( の定義は対象外）
+        .replace(/(^|[^.\w$])(?<!await )(?<!function )input(\s*\()/g, '$1await input$2');
 }
 
 // ====== 動作ハイライト用に、行の頭へ目印を挿し込む ======
@@ -329,7 +348,7 @@ function watchAlive() {
 }
 
 function run() {
-    let src = normalizeSource(document.getElementById('code').value);
+    let src = toAsync(normalizeSource(document.getElementById('code').value));
     // 動作ハイライトは「実行中に記録して、あとから再生する」方式なので、
     // 実時間で描き進むスケッチには使えない（キャンバスだけ先に描き終わってしまう）
     const isSketch = /\bfunction\s+(setup|draw)\s*\(/.test(src);
@@ -594,14 +613,14 @@ codeEl.addEventListener('input', () => {
 
 const SAMPLE = [
     '// ====== 共通の入出力機能（変更しない）======',
-    'import { output, input, close } from "./io.js";',
+    'import { output, input } from "./io.js";',
     '// ==========================================',
     '',
-    'async function main() {',
+    'function main() {',
     '    let d, i, first, last, center;',
     '    const s = [0, 1, 2, 4, 5, 7, 8, 9];',
     '    const N = s.length;',
-    '    d = parseInt(await input("Input search number: "));',
+    '    d = parseInt(input("Input search number: "));',
     '    first = 0;',
     '    last = N - 1;',
     '    while (first <= last) {             // 探索範囲が空でない間',
@@ -619,7 +638,7 @@ const SAMPLE = [
     '    output("I can\'t find: " + d + "\\n");',
     '}',
     '',
-    'main().finally(close);',
+    'main();',
 ].join('\n');
 
 // p5.js版の既定サンプル。テキスト専用のサンプルだと、開いた直後は

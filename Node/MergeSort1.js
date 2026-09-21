@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function mergeSort(s) {
@@ -50,7 +50,7 @@ function mergeSort(s) {
     }
 }
 
-async function main() {
+function main() {
 // const s = [4, 5, 2, 3, 7, 10, 8, 1, 9, 6, 0, -1, -2];
     const s = [4, 5, -2, 7, 3, 10, 8, 1, 6, 9, 0, -1, 2];
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
@@ -67,4 +67,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

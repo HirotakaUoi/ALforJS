@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
@@ -76,12 +76,12 @@ function qsort(s, first, last) {
 function quickSort(s) {
     const N = s.length; qsort(s, 0, N - 1); }
 
-async function main() {
+function main() {
 // const s = [4, 5, 2, 8, 6, 10, 11, 9, 3, 0, -1, -2, 1];
 // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2,
 // 100,-100,2];
 // const N = 13;
-    const arraySize = parseInt(await input("Input array size: "));
+    const arraySize = parseInt(input("Input array size: "));
     const s = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     const N = arraySize;
     for (let i = 0; i < N; i++) {
@@ -101,4 +101,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

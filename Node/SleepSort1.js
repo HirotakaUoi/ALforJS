@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function sleepkSort(s) {
@@ -14,7 +14,7 @@ function sleepkSort(s) {
     }
 }
 
-async function main() {
+function main() {
     const s = [30, 9, 5, 15, 8, 6, 1];
     const N = s.length;
 
@@ -30,4 +30,4 @@ async function main() {
 
 // node SleepSort1.js
 
-main().finally(close);
+main();

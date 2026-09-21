@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function BruteForce(p, s) {
@@ -18,9 +18,9 @@ function BruteForce(p, s) {
     return -1;
 }
 
-async function main() {
-    const p = await input("Input pattern string: ");
-    const s = await input("Input string: ");
+function main() {
+    const p = input("Input pattern string: ");
+    const s = input("Input string: ");
     output("0123456789012345678901234567890123456789\n");
     output(s + "\n");
     const result = BruteForce(p, s);
@@ -30,4 +30,4 @@ async function main() {
         output("Pattern matched! at " + result + "\n");
 }
 
-main().finally(close);
+main();

@@ -1,12 +1,12 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
-async function main() {
+function main() {
     const s = [3, 5, 2, 8, 7, 1, 9, 0, 10, 4];
     const N = s.length;
 
-    const d = parseInt(await input("Input: "));
+    const d = parseInt(input("Input: "));
 
     for (let i = 0; i < N; i++) {
         if (d === s[i]) {
@@ -17,4 +17,4 @@ async function main() {
     output("I can't find\n");
 }
 
-main().finally(close);
+main();

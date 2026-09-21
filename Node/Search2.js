@@ -1,12 +1,12 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
-async function main() {
+function main() {
     const s = [4, 5, 2, 8, 7, 1, 9, 0];
     const N = s.length;     //番兵を置く前の大きさ
 
-    const d = parseInt(await input("Input search number: "));
+    const d = parseInt(input("Input search number: "));
     s[N] = d;   //配列の最後に番兵としてdを追加する（JSの配列は自動で伸びる）
 
     let i = 0;
@@ -18,4 +18,4 @@ async function main() {
     }
 }
 
-main().finally(close);
+main();

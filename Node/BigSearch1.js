@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
@@ -93,8 +93,8 @@ function bsearch1(s, d) {
   return 0;
 }
 
-async function main() {
-  const arraySize = parseInt(await input("Input array size: "));
+function main() {
+  const arraySize = parseInt(input("Input array size: "));
   const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
   const N = arraySize;
   for (let i = 0; i < N; i++) {
@@ -106,10 +106,10 @@ async function main() {
   }
   output("\n");
 
-  const d = parseInt(await input("Input search number: "));
+  const d = parseInt(input("Input search number: "));
 
   search1(s, d);
   bsearch1(s, d);
 }
 
-main().finally(close);
+main();

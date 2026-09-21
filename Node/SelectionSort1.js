@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function selectionSort(s) {
@@ -21,7 +21,7 @@ function selectionSort(s) {
 
 }
 
-async function main() {
+function main() {
     const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0,];
 // // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
     const N = s.length;
@@ -39,4 +39,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

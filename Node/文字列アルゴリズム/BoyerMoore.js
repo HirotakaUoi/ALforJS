@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 // ずらし表の作成
@@ -47,9 +47,9 @@ function BMHSearch(target, pattern) {
     return -1;  // 見つからなかった
 }
 
-async function main() {
-    const p = await input("Input pattern string: ");
-    const s = await input("Input string: ");
+function main() {
+    const p = input("Input pattern string: ");
+    const s = input("Input string: ");
     const result = BMHSearch(s, p);
     if (result === -1)
         output("Pattern not matched!\n");
@@ -57,4 +57,4 @@ async function main() {
         output("Pattern matched! at " + result + "\n");
 }
 
-main().finally(close);
+main();

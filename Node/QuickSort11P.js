@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 // 配列の分割
@@ -96,4 +96,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

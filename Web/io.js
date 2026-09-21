@@ -1,10 +1,12 @@
 // ====== 共通の入出力機能（ブラウザ実行環境・変更しない）======
-// Node/io.js のブラウザ版。output / input / close を
-// グローバルに用意するので、プログラム側の書き方は Node 版とまったく同じになる。
+// output / input をグローバルに用意する。プログラム側の書き方はスライドと同じ。
 //
-//   output(s)   : C++の cout << 相当（改行なし出力）
-//   input(msg) : C++の cin >> 相当（呼び出し側は await input(...)）
-//   close()    : Node版と形を合わせるためのもの。ブラウザでは何もしない
+//   output(s)  : C++の cout << 相当（改行なし出力）
+//   input(msg) : C++の cin >> 相当（1行受け取る）
+//
+// ブラウザではキー入力を同期で待てないので、ここの input は Promise を返す。
+// プログラムを同期の形のまま書けるように、実行環境が実行の直前に
+// input( の前へ await を、main の前へ async を補う（runner.js の toAsync）。
 //
 // 時間計測は Node にもブラウザにもある performance.now() をそのまま使うので、ここでは用意しない
 //
@@ -43,7 +45,6 @@ function ioLibrary() {
     // output は p5 も window も使っていないので、取り合いにならない
     window.output = myOutput;
     window.input = myInput;
-    window.close = function () { };               // Node版と形を合わせるだけ
 
     window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'fit') { fitAllCanvases(); return; }

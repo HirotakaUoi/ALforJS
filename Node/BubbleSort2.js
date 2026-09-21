@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
@@ -16,8 +16,8 @@ function bubbleSort(s) {
       }
 }
 
-async function main() {
-  const arraySize = parseInt(await input("Input array size: "));
+function main() {
+  const arraySize = parseInt(input("Input array size: "));
   const s = [];     // JSの配列は自動拡張されるため大きさの指定は不要
   const N = arraySize;
   for (let i = 0; i < N; i++) {
@@ -35,4 +35,4 @@ async function main() {
   output("\n");
 }
 
-main().finally(close);
+main();

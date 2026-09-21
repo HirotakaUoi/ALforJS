@@ -14,46 +14,54 @@
 ## フォルダ構成
 
 - `C++/` — 元の C++ ソース（参考用。**手を入れない**）
-- `Node/` — **標準版**。全45本＋共通ライブラリ。VSCode で動かすメイン環境
-  - `io.js` — 共通の入出力ライブラリ。`output` / `input` / `close` を `export` するので、
-    各プログラムは `import { output, input, close } from "./io.js";` の1行だけで済む
+- `Node/` — **標準版**。全47本＋共通ライブラリ。VSCode で動かすメイン環境
+  - `io.js` — 共通の入出力ライブラリ。`output` / `input` を `export` するので、
+    各プログラムは `import { output, input } from "./io.js";` の1行だけで済む
   - `package.json` — `{ "type": "module" }` の1行だけ。これで拡張子は `.js` のまま
     ES モジュールとして扱われる（`.mjs` に変える必要も、Node の版に頼る必要もない）
     - **学生には存在も必要性も知らせない**。スライドにも Web/ の画面にも出さない。
       Node 22.7 / 20.19 以上なら構文判定が働くので、無くても動く（実測で確認済み）。
       置いてあるのは古い Node への保険であって、学生が意識する必要はないため
   - `文字列アルゴリズム/` — BoyerMoore / BruteForceMatching / KMPMatching
-    - 同フォルダの `io.js` は `../io.js` を再 export する中継。これで共通ブロックが45本すべて同一になる
+    - 同フォルダの `io.js` は `../io.js` を再 export する中継。これで共通ブロックが47本すべて同一になる
     - `package.json` は上の階層のものが効くので、このフォルダには置かなくてよい
 - `Web/` — ブラウザ実行環境。`Node/` のソースを貼り付けて動かす
   - `html.html` — **HTML版**。テキスト入出力のみ。外部ライブラリ不要でオフラインでも動く
   - `p5.html` — **p5.js版**。HTML版＋描画キャンバス
   - `io.js` — ブラウザ版の共通入出力ライブラリ（`Node/io.js` と対）
-  - `runner.js` / `runner.css` — 実行エンジンとスタイル（2ページで共用）
+  - `runner.js` / `runner.css` — 実行エンジンとスタイル（2ページで共用）。
+    `toAsync` が同期の書き方を実行できる形に直し、`normalizeSource` が `import` 行と末尾の
+    `main()` を取り除く（どちらも行数を変えない）
   - `index.html` — 入口
 - `tools/aligncomments.js` — `Node/` のコメント位置を揃える（`node tools/aligncomments.js`）
 
-## プログラムの書き方（全45本で統一）
+## プログラムの書き方（全47本で統一）
 
 ```js
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
-async function main() {
-    const d = parseInt(await input("Input search number: "));
+function main() {
+    const d = parseInt(input("Input search number: "));
     output("...");
 }
 
-main().finally(close);
+main();
 ```
 
-- 共通ブロック3行と末尾行は**全45ファイル完全に同一**（入力を使わないファイルも例外なく）
+- 共通ブロック3行と末尾行は**全47ファイル完全に同一**（入力を使わないファイルも例外なく）
 - `output(s)` — cout 相当の改行なし出力。**`print` ではない**（p5.js がグローバルの `print` を
   自分のもので上書きしてしまうため。`output` は p5 とも `window` とも衝突しない）
-- `input(msg)` — cin 相当。Promise を返すので **必ず `await input(...)`**、`main()` は `async`
-  （ブラウザではキーボード入力を同期で待てないため、両環境とも async に統一）
-- `close()` — 標準入力を閉じる。呼ばないと対話実行時にプロセスが終わらない
+- `input(msg)` — cin 相当。**同期**なので `await` は書かない。`main()` も `async` にしない
+  - Node: `fs.readSync` で標準入力から1行読む（本当に同期）。バイトをためて UTF-8 で復号するので
+    日本語も入る。`readline` を使わないので標準入力が開いたままにならず、**閉じる処理も要らない**
+  - ブラウザ: キー入力を同期で待てないので `input` は Promise を返す。そのままでは動かないため、
+    **実行環境が実行の直前に `await` と `async` を補う**（`Web/runner.js` の `toAsync`）。
+    挿すのは同じ行の中なので行数は変わらず、行番号も動作ハイライトもずれない
+  - **例外は `QuickSort1P` / `QuickSort11P` の2本だけ**。`main()` の中で `await Promise.all(...)` を
+    使う（スレッド模擬）ので `async function main()` のまま。共通ブロックと末尾行は同じ
+- `close()` は**もう無い**（`io.js` が export するのは `output` / `input` の2つだけ）
 - `parseInt(s)` — 数値にするときは**第2引数を書かない**（10進数しか扱わないため。8進数の自動判定は
   ES5 で廃止済みなので `parseInt("08")` も 8 になる）。文字列のまま使う入力には付けない
 - 時間計測（BigSort2）は `performance.now()` をそのまま使う。Node にもブラウザにも標準で入っている
@@ -93,8 +101,9 @@ main().finally(close);
 - **ブラウザ**: https://js-code-runner.fishbone.jp/ を開く（GitHub Pages。**授業で配るのはこの URL**）。
   手元のファイルなら `Web/index.html` をダブルクリック → HTML版 / p5.js版 を選ぶ（サーバー不要）
   - `Node/` のソースを**まるごと**コード欄に貼れば動く。`import` 行と末尾の `main()` 呼び出しは
-    実行環境が自動で取り除く。共通ブロックのコメント行（`// =====`）を外して `import` の1行だけ
-    貼っても動く（古い `require` 版もそのまま受け付ける）
+    実行環境が自動で取り除き、`await` / `async` も自動で補う。共通ブロックのコメント行（`// =====`）を
+    外して `import` の1行だけ貼っても動く（古い `require` 版・旧 `await`/`close` 版も受け付ける）
+  - HTML版 / p5.js版のヘッダー左に「入口」へ戻るリンクがある（`index.html` への相対リンク）
   - 実行 = Ctrl/Cmd + Enter、中止 = Esc。書いたコードは `localStorage` に自動保存
   - キャンバスは既定で非表示。`createCanvas()` が呼ばれると自動で開く（実行1回につき1度だけ）。
     枠（400px）より大きいキャンバスは縦横比を保ったまま縮めて全体を表示する
@@ -105,6 +114,71 @@ main().finally(close);
 
 ---
 ## 作業引き継ぎログ
+
+### 2026-09-21（2）
+
+**やったこと（`async` / `await` / `close()` を学生の書く形から消した）:**
+
+きっかけは「main の async と input の await をなくせないか」という問い。
+**Node 側は本当に同期にでき、ブラウザ側は実行環境が裏で補う**、という形に落ち着いた。
+
+1. **`Node/io.js` を同期版に作り直した**
+   - `readline` をやめ、`fs.readSync(0, …)` で標準入力から1バイトずつ読んで改行まで溜める
+   - **バイトを溜めてから UTF-8 で復号する**（1バイトずつ文字に変えると日本語が壊れる。
+     2026-08-02 に一度そうして壊れた経緯があるので、ここは戻さないこと）
+   - 端末から入力がまだ届いていないとき（`EAGAIN`）は待って読み直す
+   - `readline` を使わないので**標準入力が開いたままにならず、`close()` が不要**になった。
+     export するのは `output` / `input` の2つだけ
+2. **47本すべてを同期の書き方に直した**
+   - `import { output, input } from "./io.js";` ／ `function main()` ／ `input(...)` ／ `main();`
+   - **例外は `QuickSort1P` / `QuickSort11P` の2本**。`main()` の中で `await Promise.all(...)` を
+     使う（スレッド模擬）ので `async function main()` のまま。共通ブロックと末尾行は全47本同一
+3. **`Web/runner.js` に `toAsync()` を追加**（ブラウザだけ裏で書き換える）
+   - 実行の直前に `function main(` → `async function main(`、`input(` → `await input(` を補う
+   - **挿すのはどちらも同じ行の中なので行数が変わらない**。コード欄の行番号・動作ハイライト・
+     エラー表示がそのまま効く（これが成立の条件だった）
+   - `normalizeSource` → `toAsync` → `instrument` の順で通す
+4. `Web/io.js` から `window.close` の上書きを削除。ライブラリ欄の説明と既定サンプルも同期の形に
+5. **サブページ（HTML版 / p5.js版）のヘッダーに「入口」へ戻るリンクを付けた**
+   - 相対リンク（`index.html`）なので `file://` でも公開サイトでも動く
+   - リンクを足したぶんヘッダーが2行に折れたので、間隔を 16px → 12px に詰め、
+     タイトルとボタンを折り返さないようにし、820px 以下では操作の説明を隠すようにした
+   - `Web/index.html` の説明文が旧形式（`close` 付き）のままだったので現状に合わせた
+
+**検証:**
+
+- **Node**: 46本を変更前後で実行して比較 — **38本が出力完全一致**、残る8本は乱数依存
+  （BigSearch1 / BigSort2 / BitonicSort0 / BitonicSort2 / BogoSort1 / BubbleSort2 /
+  QuickSort3 / **RadixSort1**）で、2回走らせて自分自身とも一致しないことを確認
+- **疑似端末（TTY）での対話実行**も確認。`close()` なしで終了コード0、日本語の入力も化けない
+- **ブラウザ**: `http://localhost:8765/Web/html.html` で確認 — Search1／NameLoop（日本語2回入力）／
+  Hello（入力なし）／QuickSort1P（async main のまま）がいずれも正常。
+  貼り付け方も6通り（共通ブロックあり・import 1行だけ・共通ブロックなし・**旧 async/await/close 版**・
+  **旧 require 版**）すべて動く。動作ハイライト ON、エラー表示（`『answr』が見つかりません`）も確認
+- **p5.js版**: スケッチが動きキャンバスに描画されることを確認。入口リンクの往復も両ページで確認
+
+**技術的に確定したこと（再調査不要）:**
+
+- **ブラウザで「本当に同期な入力」は作れない**。回避策は2つあるが、どちらもこのプロジェクトでは使えない
+  - `Atomics.wait`（Worker + SharedArrayBuffer）: **Worker には DOM がないので p5.js が動かない**。
+    加えて `SharedArrayBuffer` は cross-origin isolation が必要で、**`file://` では不可能**
+  - `prompt()`: 同期だが **VSCode 内蔵ブラウザでダイアログが出ない**うえ、ターミナル風の入力欄が失われる
+  - だから「実行環境が裏で `await` を補う」以外に道はない
+- **`fs.readSync` 方式なら `close()` は要らない**。`readline` が標準入力を開くのが原因だったため
+  （2026-09-07 に「入力を使わない24本にも `close()` が要る」と書いたのは readline 方式での話）
+- `input()` を呼ぶのは**全部 `main()` の中だけ**（23本を確認）。だから `toAsync` の規則が単純で済む
+
+**次回への注意:**
+
+- **`Node/BubbleSort1.js` の「一時的」な変更（交換を分割代入に、`temp` 版をコメントで残す）は、
+  今回のコミットに含まれている**。io.js を変えた以上この1本だけ旧形式で残すと動かなくなるため。
+  戻すか確定するかは未決。確定するなら未使用の `let temp;` を消すこと
+- **ブラウザは HTML と CSS を強くキャッシュする**。手元で確認するときは Cmd + Shift + R。
+  検証中も何度か古い版を掴んだ（`?v=` を付けると確実）
+- `tools/aligncomments.js` は前回同様**流さない**こと（規則と現物の食い違いは未解決のまま）
+- 未追跡のまま残してあるもの: `C++/PancakeSort1`（バイナリ）、`アルゴリズム基礎論 2026X.pdf` / `.txt`
+- **スライドの差し替えが必要**。共通ブロックの2行目（`import { output, input } …`）、
+  `async function main()`、`await input(`、`main().finally(close);` の4箇所が全スライドで変わる
 
 ### 2026-09-21
 

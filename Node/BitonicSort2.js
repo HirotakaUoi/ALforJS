@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function rand() { return Math.floor(Math.random() * 2147483648); }
@@ -30,8 +30,8 @@ function bitonicSort(s, N) {
     }
 }
 
-async function main() {
-    const logArraySize = parseInt(await input("Input array size by 2^N: "));
+function main() {
+    const logArraySize = parseInt(input("Input array size by 2^N: "));
     // ( n<<N は nのN bit左シフト == n*(2^N))
     const s = [];   // JSの配列は自動拡張されるため大きさの指定は不要
     const N = logArraySize;
@@ -50,4 +50,4 @@ async function main() {
     output("\n");
 }
 
-main().finally(close);
+main();

@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function f(n) {
@@ -13,10 +13,10 @@ function f(n) {
     }
 }
 
-async function main() {
-    const n = parseInt(await input("Input number: "));
+function main() {
+    const n = parseInt(input("Input number: "));
 
     output(f(n) + "\n");
 }
 
-main().finally(close);
+main();

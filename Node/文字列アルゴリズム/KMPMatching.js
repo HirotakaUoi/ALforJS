@@ -1,5 +1,5 @@
 // ====== 共通の入出力機能（変更しない）======
-import { output, input, close } from "./io.js";
+import { output, input } from "./io.js";
 // ==========================================
 
 function makePartialMatchTable(pat) {
@@ -46,7 +46,7 @@ function KMP(p, s) {
     return -1;
 }
 
-async function main() {
+function main() {
     let p, s;
     // Console.Write("Input pattern string: ");
     // p = Console.ReadLine();
@@ -63,4 +63,4 @@ async function main() {
         output("Pattern matched! at " + result + "\n");
 }
 
-main().finally(close);
+main();
