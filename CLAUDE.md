@@ -152,7 +152,17 @@ main();
    - あわせて `skipFiles` に `${workspaceFolder}/Node/io.js` を追加（`input()` で F11 を
      押しても共通ライブラリに入り込まない）
 4. **`BigSort2` の時間表示を `μs unit` にした**（前セッションからの続き。実装名を出力から外した）
-5. **`JSデバッガの使い方_v2.pptx` を作った**（git 管理外・6枚・4:3）
+5. **学生配布用のデバッグ設定を作った**（`Node/.vscode/launch.json` ＋ `Node/dotvscode4js.zip`）
+   - 先生用（ルートの `.vscode/`）とは**別物**。学生は `Node/` フォルダを直接開くので、
+     `skipFiles` は `${workspaceFolder}/io.js`（`Node/` を挟まない）が正しい
+   - **node の場所は決め打ちしない**。`runtimeExecutable` はコメントアウトしておき、
+     `osx` / `windows` / `linux` ブロックで `env.PATH` に探索先を足す形にした
+     （Mac は `:`、Windows は `;` と区切り文字が違うので、OS ごとに分ける必要がある）
+   - 見つからないときの手順を冒頭に明記（`command -v node` / `where node`、よくある場所4つ、
+     Windows のパスは `\\` と2つ重ねる注意）
+   - **`env.PATH` で `runtimeExecutable` の解決まで効くかは未確認**。効かなくても
+     冒頭の案内で1行書き換えれば動くので、二段構えにしてある
+6. **`JSデバッガの使い方_v2.pptx` を作った**（git 管理外・6枚・4:3）
    - 既存デッキに合わせて 10×7.5インチ、見出しはヒラギノ角ゴ Pro W6、本文 Osaka、
      コード Source Han Code JP
    - 内容: デバッグとは／ブレークポイント／F5で実行／変数とウォッチ式／進める4キー／つまずき4つ
@@ -186,12 +196,7 @@ main();
 
 - **一時的に `Node/` フォルダが消えていた**（50ファイル全部）。git から復旧済み。
   Dropbox の同期か誤操作と思われる。**コミットしてあれば `git restore Node/` で戻せる**
-- **`Node/.vscode/launch.json` と `Node/dotvscode4js.zip` は未コミット**（学生配布用と思われる）。
-  2点気になる:
-  - `skipFiles` が `${workspaceFolder}/Node/io.js` のまま。**学生が `Node/` を直接開くと
-    `${workspaceFolder}` が `Node/` になるのでパスが合わない**（`${workspaceFolder}/io.js` が正）
-  - `runtimeExecutable` が `/opt/homebrew/bin/node` 固定。Intel Mac は `/usr/local/bin/node`、
-    Windows は別。配布するなら注意書きが要る
+- **学生の Windows 機での動作確認がまだ**（この環境に Windows が無い）。配布前に1台で試すこと
 - スライド（pptx）まわりは前回から進んでいない（C++ の痕跡の除去・GS への取り込み・文言差34枚の扱い）
 
 ### 2026-09-21（3）

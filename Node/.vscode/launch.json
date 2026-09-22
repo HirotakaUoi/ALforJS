@@ -1,0 +1,58 @@
+{
+    // ===== 使い方 =====
+    //   デバッグしたい .js のファイルを開いて F5 を押す
+    //   入力は下の「ターミナル」に打つ（「デバッグコンソール」では打てない）
+    //
+    // ===== 「Node.js バイナリ "node" が見つかりません」と出たら =====
+    //   VS Code が node の場所を見つけられていない。下の「runtimeExecutable」の行の
+    //   先頭にある // を消して、自分のパソコンの node の場所に書き換える。
+    //
+    //   場所の調べ方
+    //     Mac      ターミナルで      command -v node
+    //     Windows  コマンドプロンプトで   where node
+    //
+    //   よくある場所
+    //     /usr/local/bin/node                … Mac（nodejs.org の installer）
+    //     /opt/homebrew/bin/node             … Mac（Homebrew・Apple Silicon）
+    //     /usr/local/bin/node                … Mac（Homebrew・Intel）
+    //     C:\\Program Files\\nodejs\\node.exe   … Windows（installer）
+    //   ※ Windows では ¥ (または \) を2つ重ねて書く
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "現在のファイルをデバッグ",
+            "program": "${file}",
+
+            // 見つからないときだけ、// を消して自分の場所に書き換える
+            // "runtimeExecutable": "/usr/local/bin/node",
+
+            // input() をターミナルで受け取るために必要
+            // （デバッグコンソールには入力欄が無く、input() が空になってしまう）
+            "console": "integratedTerminal",
+
+            "skipFiles": [
+                "<node_internals>/**",         // Node の内部には入らない
+                "${workspaceFolder}/io.js"     // 共通の入出力機能にも入らない
+            ],
+
+            // node を探す場所を足しておく（OS ごとに分けて指定）
+            "osx": {
+                "env": {
+                    "PATH": "/usr/local/bin:/opt/homebrew/bin:${env:PATH}"
+                }
+            },
+            "windows": {
+                "env": {
+                    "PATH": "C:\\Program Files\\nodejs;${env:PATH}"
+                }
+            },
+            "linux": {
+                "env": {
+                    "PATH": "/usr/local/bin:/usr/bin:${env:PATH}"
+                }
+            }
+        }
+    ]
+}
