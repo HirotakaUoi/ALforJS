@@ -2,7 +2,7 @@
 import { output, input } from "./io.js";
 // ==========================================
 
-function sleepkSort(s) {
+function sleepSort(s) {
     const N = s.length;
     for (let i = 0; i < N; ++i) {
         // setTimeoutでスレッドの代わりにタイマーを作成
@@ -16,14 +16,13 @@ function sleepkSort(s) {
 
 function main() {
     const s = [30, 9, 5, 15, 8, 6, 1];
-    const N = s.length;
 
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 
-    sleepkSort(s);
+    sleepSort(s);
 }
 
 

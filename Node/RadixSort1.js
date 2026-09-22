@@ -27,8 +27,8 @@ function radixSort(s, max) {
         for (j = 0; j < 10; j++)
             for (i = 0; i < b[j].length; i++)
                 s[k++] = b[j][i];
-        for (k = 0; k < N; k++) {
-            output(s[k] + " ");
+        for (const v of s) {
+            output(v + " ");
         }
         output("\n");
     }
@@ -36,19 +36,18 @@ function radixSort(s, max) {
 
 function main() {
     // const s = [345, 98, 302, 719, 804, 620, 183, 431, 572];
-    // const N = s.length;
     const s = [];
     const N = 20;
     for (let i = 0; i < N; i++) {
         s[i] = (rand() % 1000);
     }
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
     radixSort(s, 1000);
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

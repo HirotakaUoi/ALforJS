@@ -20,8 +20,8 @@ function bogoSort(s) {
     let swapped;
 
     while (true) {
-        for (let k = 0; k < N; k++) {
-            output(s[k] + " ");
+        for (const v of s) {
+            output(v + " ");
         }
         output("Count=" + count++ + "\n");
         swapped = false;
@@ -37,20 +37,15 @@ function bogoSort(s) {
 }
 
 function main() {
-    const s = [4, 5, 2];
-    const N = s.length;
-// const s = [4, 5, 2, 9, 3];
-// const N = 5;
-// const s = [4, 5, 2, 7, 1, 9, 3];
-// const N = 7;
-// const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
-// const N = 9;
-// const s = [4, 5, 8, 2, 7, 1, 9, 0, 3, 10];
-// const N = 13;
+    // const s = [4, 5, 2];
+    const s = [4, 5, 2, 9, 3];
+    // const s = [4, 5, 2, 7, 1, 9, 3];
+    // const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
+    // const s = [4, 5, 8, 2, 7, 1, 9, 0, 3, 10];
 
     bogoSort(s);
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

@@ -3,7 +3,8 @@ import { output, input } from "./io.js";
 // ==========================================
 
 function bsearch(dst, first, last, s) {
-    if (first > last) return -1;
+    if (first > last)
+        return -1;
     const center = Math.floor((first + last) / 2);
 
     if (dst === s[center]) {

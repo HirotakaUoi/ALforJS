@@ -46,16 +46,15 @@ function mergeSort(s) {
 
 function main() {
     const s = [4, 5, 2, 3, 7, 10, 8, 1, 9, 6, 0, -1, -2];
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
-    const N = s.length;
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 
     mergeSort(s);
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

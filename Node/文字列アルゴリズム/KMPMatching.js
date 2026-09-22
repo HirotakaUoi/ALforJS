@@ -25,7 +25,7 @@ function KMP(p, s) {
     let i, j;
 
     const pmt = makePartialMatchTable(p);
-    for (let k = 0; k < p.length; k++) output(pmt[k] + " ");
+    for (const v of pmt) output(v + " ");
     output("\n");
     output(p + "\n");
     output(s + "\n");

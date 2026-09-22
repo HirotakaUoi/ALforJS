@@ -7,6 +7,15 @@
             "request": "launch",
             "name": "現在のファイルをデバッグ",
             "program": "${file}",
+
+            // node の場所を明示する。
+            // VS Code を Finder や Dock から起動すると、ログインシェルの PATH を
+            // 引き継がないので「Node.js バイナリ "node" が見つかりません」になる。
+            // 別のところに入れている場合は、ターミナルで
+            //     command -v node
+            // と打って出たパスに書き換える。
+            "runtimeExecutable": "/opt/homebrew/bin/node",
+
             "console": "integratedTerminal",  // input() をターミナルで受け取るため
                                               // （デバッグコンソールには標準入力が無く、
                                               //   input() が空文字を返して NaN になる）

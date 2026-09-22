@@ -33,8 +33,8 @@ function rebuildHeap(s, max) {
                     break;
                 }
             }
-         } else if (i * 2 + 1 < max) {
-             if (s[i * 2 + 1] > s[i]) {
+        } else if (i * 2 + 1 < max) {
+            if (s[i * 2 + 1] > s[i]) {
                 swap(s, i, i * 2 + 1);
                 i = i * 2 + 1;
             } else {
@@ -51,8 +51,8 @@ function heapSort(s) {
     let i;
     for (i = 1; i < N; i++) {
         insertHeap(s, i);
-        for (let k = 0; k < N; k++) {
-            output(s[k] + " ");
+        for (const v of s) {
+            output(v + " ");
         }
         output("\n");
     }
@@ -60,22 +60,21 @@ function heapSort(s) {
     for (i = 0; i < N - 1; i++) {
         swap(s, 0, N - 1 - i);
         rebuildHeap(s, N - 1 - i);
-        for (let k = 0; k < N; k++) {
-            output(s[k] + " ");
+        for (const v of s) {
+            output(v + " ");
         }
         output("\n");
     }
 }
 
 function main() {
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
     const s = [4, 5, 2, 8, 7, 10, 1, 11, 6, 3, 9, 12, -2];
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
-    const N = s.length;
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
 
     heapSort(s);
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

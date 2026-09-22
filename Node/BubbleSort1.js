@@ -6,8 +6,11 @@ function bubbleSort(s) {
   const N = s.length;
   let temp;
   for (let i = 0; i < N - 1; i++) {
-    for (let k = 0; k < N; k++) {
-      output(s[k] + " ");
+    // for (let k = 0; k < N; k++) {
+    //   output(s[k] + " ");
+    // }
+    for (const v of s) {
+      output(v + " ");
     }
     output("\n");
     for (let j = 0; j < N - 1; j++)
@@ -28,8 +31,8 @@ function main() {
   // const N = 7;
 
   bubbleSort(s);
-  for (let k = 0; k < N; k++) {
-    output(s[k] + " ");
+  for (const v of s) {
+    output(v + " ");
   }
   output("\n");
 }

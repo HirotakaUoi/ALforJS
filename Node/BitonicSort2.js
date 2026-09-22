@@ -36,14 +36,14 @@ function main() {
     for (let i = 0; i < (1 << logArraySize); i++) {
         s[i] = (rand() % 10000);
     }
-    for (let k = 0; k < (1 << logArraySize); k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 
     bitonicSort(s, N);
-    for (let k = 0; k < (1 << logArraySize); k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

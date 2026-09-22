@@ -24,13 +24,13 @@ function bitonicsort(lgn, ary) {
 function main() {
     const lgn = 10;
     const ary = [];     // JSの配列は自動拡張されるため大きさの指定は不要
-    output(String(1 << lgn));
+    output(String(1 << lgn) + "\n");
     for (let i = 0; i < (1 << lgn); i++) {
         ary[i] = rand() % 10000;
     }
     bitonicsort(lgn, ary);
-    for (let i = 0; i < (1 << lgn); i++) {
-        output(ary[i] + ", ");
+    for (const v of ary) {
+        output(v + " ");
     }
     output("\n");
 }

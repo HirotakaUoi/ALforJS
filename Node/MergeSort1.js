@@ -41,8 +41,8 @@ function mergeSort(s) {
         }
         for (i = 0; i < N; i++)
             s[i] = b[i];
-        for (let p = 0; p < N; p++) {
-            output(s[p] + " ");
+        for (const v of s) {
+            output(v + " ");
         }
         output("msize= " + msize + "\n");
         // ================  0 =============
@@ -51,18 +51,17 @@ function mergeSort(s) {
 }
 
 function main() {
-// const s = [4, 5, 2, 3, 7, 10, 8, 1, 9, 6, 0, -1, -2];
+    // const s = [4, 5, 2, 3, 7, 10, 8, 1, 9, 6, 0, -1, -2];
     const s = [4, 5, -2, 7, 3, 10, 8, 1, 6, 9, 0, -1, 2];
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
-    const N = s.length;
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -1, -2];
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 
     mergeSort(s);
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

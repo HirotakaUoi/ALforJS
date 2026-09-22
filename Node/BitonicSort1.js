@@ -26,14 +26,14 @@ function main() {
     // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
     const N = 4;
     // ( n<<N は nのN bit左シフト == n*(2^N))
-    for (let k = 0; k < (1 << N); k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 
     bitonicSort(s, N);
-    for (let k = 0; k < (1 << N); k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }

@@ -4,7 +4,7 @@ import { output, input } from "./io.js";
 
 function shellSort(s) {
     const N = s.length;
-    let temp, i, j, h;
+    let i, j, h;
 
     h = 1;
     while (h < N)
@@ -13,20 +13,18 @@ function shellSort(s) {
 
     while (h > 0) {
         output(h + " : ");
-        for (let x = 0; x < N; x++) {
-            output(s[x] + " ");
+        for (const v of s) {
+            output(v + " ");
         }
         output("\n");
         for (i = h; i < N; i++) {
-            for (let x = 0; x < N; x++) {
-                output(s[x] + " ");
+            for (const v of s) {
+                output(v + " ");
             }
             output("\n");
             j = i;
             while ((j >= h) && (s[j - h] > s[j])) {
-                temp = s[j];
-                s[j] = s[j - h];
-                s[j - h] = temp;
+                [s[j], s[j - h]] = [s[j - h], s[j]];
                 j -= h;
             }
         }
@@ -36,22 +34,15 @@ function shellSort(s) {
 
 function main() {
     const s = [8, 3, 4, 1, 7, 6, 9, 5, 0];
-    const N = s.length;
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -2, -1, 6];
-// const N = 14;
-// const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
-// const N = 9;
-
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, 9, 3, 0, -2, -1, 6];
+    // const s = [4, 5, 2, 8, 7, 1, 9, 3, 0];
+    // const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
 
     shellSort(s);
-    for (let k = 0; k < N; k++) {
-        output(s[k] + " ");
+    for (const v of s) {
+        output(v + " ");
     }
     output("\n");
 }
-
-
-
-// const s = [4, 5, 2, 8, 7, 10, 8, 1, -10, -4, 9, 3, 0, 12, 0, 2, 100,-100,2];
 
 main();
