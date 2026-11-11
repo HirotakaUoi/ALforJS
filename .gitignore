@@ -2,3 +2,6 @@
 .codex_tmp/
 *.inspect.ndjson
 *.pptx
+
+# Claude Code local settings
+.claude/settings.local.json
